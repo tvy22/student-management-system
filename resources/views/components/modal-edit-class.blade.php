@@ -1,4 +1,3 @@
-
 <div x-show="showEditClassModal" x-cloak class="fixed inset-0 z-100 overflow-y-auto">
     {{-- Backdrop --}}
     <div x-show="showEditClassModal" x-transition.opacity @click="showEditClassModal = false" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
@@ -22,52 +21,51 @@
             </div>
 
             {{-- Form Body --}}
-            <form action="#" method="POST" class="p-8 space-y-5">
-                @csrf
-                @method('PUT')
-
-                <div>
-                    <label class="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1 text-left">Class Name</label>
-                    <input type="text" name="name" value="Mathematics Advanced" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-amber-500 focus:bg-white outline-none transition font-bold text-slate-700">
-                    @error('name')
-                        <span class="text-[10px] font-black text-red-500 uppercase tracking-tight ml-2 mt-1 block">{{ $message }}</span>
-                    @enderror
-                </div>
+            <form @submit.prevent="updateClass()" class="p-8 space-y-5">
 
                 <div class="grid grid-cols-2 gap-4 text-left">
+                    <div>
+                        <label class="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1 text-left">Course Name</label>
+                        <select x-model="editFormData.course" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-amber-500 focus:bg-white outline-none transition font-bold text-slate-700">
+                            <option>React+Laravel</option>
+                            <option>HTML/CSS/JavaScript</option>
+                            <option>MySql</option>
+                            <option>C++</option>
+                            <option>Python</option>
+                        </select>
+                    </div>
                     <div>
                         <label class="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Room</label>
-                        <input type="text" name="room" value="Room 302" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-amber-500 focus:bg-white outline-none transition font-bold text-slate-700">
-                        @error('room')
-                            <span class="text-[10px] font-black text-red-500 uppercase tracking-tight ml-2 mt-1 block">{{ $message }}</span>
-                        @enderror
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Term</label>
-                        <input type="text" name="term" value="Sat - Sun" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-amber-500 focus:bg-white outline-none transition font-bold text-slate-700">
-                        @error('term')
-                            <span class="text-[10px] font-black text-red-500 uppercase tracking-tight ml-2 mt-1 block">{{ $message }}</span>
-                        @enderror
+                        <select x-model="editFormData.room" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-amber-500 focus:bg-white outline-none transition font-bold text-slate-700">
+                            <option>A101</option>
+                            <option>B303</option>
+                            <option>C120</option>
+                            <option>A204</option>
+                            <option>B402</option>
+                        </select>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 text-left">
-                    <div class="text-left">
-                        <label class="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Teacher Name</label>
-                        <input type="text" name="teacher" value="Dr. Sarah Jenkins" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-amber-500 focus:bg-white outline-none transition font-bold text-slate-700">
-                        @error('teacher')
-                            <span class="text-[10px] font-black text-red-500 uppercase tracking-tight ml-2 mt-1 block">{{ $message }}</span>
-                        @enderror
+                    <div>
+                        <label class="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Term</label>
+                        <select x-model="editFormData.term" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-amber-500 focus:bg-white outline-none transition font-bold text-slate-700">
+                            <option>Sat-Sun</option>
+                            <option>Mon-Fri</option>
+                            <option>Mon-Thu</option>
+                        </select>
                     </div>
-                    <div class="text-left">
-                        <label class="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Total Hours</label>
-                        <input type="text" name="hours" value="200" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-amber-500 focus:bg-white outline-none transition font-bold text-slate-700">
-                        @error('hours')
-                            <span class="text-[10px] font-black text-red-500 uppercase tracking-tight ml-2 mt-1 block">{{ $message }}</span>
-                        @enderror
+                    <div>
+                        <label class="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Class Time</label>
+                        <select x-model="editFormData.class_time" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-amber-500 focus:bg-white outline-none transition font-bold text-slate-700">
+                            <option>9:00-10:30am</option>
+                            <option>11:00-12:30am</option>
+                            <option>1:00-2:30pm</option>
+                            <option>3:00-4:30pm</option>
+                            <option>5:00-6:30pm</option>
+                        </select>
                     </div>
                 </div>
-
 
                 <div class="pt-4 flex gap-3">
                     <button type="button" @click="showEditClassModal = false" class="flex-1 py-4 bg-gray-100 text-gray-500 font-bold rounded-2xl hover:bg-gray-200 transition cursor-pointer">

@@ -17,8 +17,23 @@
     classes: [],
     totalStudents: 0,
 
+    editFormData: {
+        course: '',
+        room: '',
+        term: '',
+        class_time: '',
+    },
+
     async init() {
         await this.fetchClasses();
+    },
+
+    // Helper to safely get teacher name from local storage
+    get teacherName() {
+        try {
+            const data = localStorage.getItem('user_data');
+            return data ? JSON.parse(data).user.name : 'Teacher';
+        } catch (e) { return 'Teacher'; }
     },
 
     async fetchClasses() {
@@ -49,25 +64,19 @@
         }
     },
 
-    {{-- delete function --}}
     async deleteClass() {
-        if (!this.selectedClassId) {
-            alert('No class selected');
-            return;
-        }
+        if (!this.selectedClassId) return;
 
         try {
             const response = await fetch(`http://127.0.0.1:8000/api/class/${this.selectedClassId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('school_token')}`,
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Accept': 'application/json'
                 }
             });
 
             if (response.ok) {
-                console.log('Class Deleted Successfully!');
                 this.showEndClassModal = false;
                 await this.fetchClasses();
             } else {
@@ -76,7 +85,30 @@
             }
         } catch (error) {
             console.error('Delete Error:', error);
-            alert('Network error. Check if API is running on port 8001.');
+        }
+    },
+
+    async updateClass() {
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/api/class/${this.selectedClassId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('school_token')}`,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(this.editFormData)
+            });
+
+            if (response.ok) {
+                this.showEditClassModal = false;
+                await this.fetchClasses();
+            } else {
+                const error = await response.json();
+                alert('Update failed: ' + (error.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Update error:', error);
         }
     },
 
@@ -88,9 +120,8 @@
     }
 }">
 
-    {{-- stats cards --}}
+    {{-- Stats Cards --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        {{-- total class--}}
         <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
             <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center shrink-0">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
@@ -103,7 +134,6 @@
             </div>
         </div>
 
-        {{-- total student --}}
         <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
             <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center shrink-0">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
@@ -112,12 +142,12 @@
             </div>
             <div>
                 <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Students</p>
-                <p class="text-2xl font-black text-slate-800" x-text="totalStudents">00</p>
+                <p class="text-2xl font-black text-slate-800" x-text="totalStudents">0</p>
             </div>
         </div>
     </div>
 
-    {{-- search + add class --}}
+    {{-- Search + Add Class --}}
     <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
         <div class="relative w-full md:w-96">
             <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
@@ -125,12 +155,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                 </svg>
             </span>
-            <input
-                x-model="search"
-                type="text"
-                placeholder="Search for a class..."
-                class="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-gray-100 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition outline-none bg-white font-medium"
-            >
+            <input x-model="search" type="text" placeholder="Search for a class..." class="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-gray-100 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition outline-none bg-white font-medium">
         </div>
 
         <button @click="showAddClassModal = true" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-2xl shadow-lg shadow-blue-200 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
@@ -141,33 +166,17 @@
         </button>
     </div>
 
-    {{-- loading spinner --}}
+    {{-- Loading Spinner --}}
     <div x-show="loading" class="col-span-full py-20 flex justify-center" x-cloak>
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
     </div>
 
-    {{-- empty state --}}
-    <div x-show="!loading && filteredClasses.length === 0" class="col-span-full py-20 flex flex-col items-center justify-center bg-white rounded-[3rem] border-2 border-dashed border-slate-100" x-cloak>
-        <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
-        </div>
-        <h3 class="text-xl font-black text-slate-800 mb-2">No Classes Found</h3>
-        <p class="text-slate-400 font-bold mb-8 text-center max-w-xs">
-            <span x-show="search === ''">It looks like you haven't created any classes yet.</span>
-            <span x-show="search !== ''">No classes match your search term "<span x-text="search" class="text-blue-600"></span>".</span>
-        </p>
-    </div>
-
-    {{-- class cards grid --}}
+    {{-- Class Cards Grid --}}
     <div x-show="!loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <template x-for="cls in filteredClasses" :key="cls.id">
             <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group">
                 <div class="p-5 bg-slate-100 border-b border-gray-100 group-hover:bg-blue-200 transition-colors">
-                    <div class="flex justify-between items-center mb-1">
-                        <h3 class="text-xl font-black text-slate-800 leading-tight" x-text="cls.course"></h3>
-                    </div>
+                    <h3 class="text-xl font-black text-slate-800 leading-tight" x-text="cls.course"></h3>
                 </div>
 
                 <div class="p-6">
@@ -182,7 +191,7 @@
                         </div>
                         <div>
                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Teacher</p>
-                            <p class="text-sm font-bold text-slate-700" x-text="JSON.parse(localStorage.getItem('user_data')).user.name"></p>
+                            <p class="text-sm font-bold text-slate-700" x-text="teacherName"></p>
                         </div>
                         <div>
                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Time</p>
@@ -192,16 +201,10 @@
 
                     <div class="mt-6 pt-4 border-t border-dashed border-gray-200 flex items-center justify-between gap-2">
                         <a href="/student" class="flex-1 flex items-center justify-center gap-1.5 px-2 py-3 bg-blue-50 text-blue-700 rounded-xl font-bold text-[10px] hover:bg-blue-100 transition active:scale-95 group uppercase tracking-tighter whitespace-nowrap">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0z" />
-                            </svg>
                             <span>Students</span>
                         </a>
 
                         <a href="/take" class="flex-1 flex items-center justify-center gap-1.5 px-2 py-3 bg-green-500 text-white rounded-xl font-bold text-[10px] hover:bg-green-700 transition active:scale-95 shadow-sm shadow-green-100 uppercase tracking-tighter whitespace-nowrap">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 shrink-0">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
                             <span>Attendance</span>
                         </a>
 
@@ -215,34 +218,29 @@
                             <div x-show="menuOpen" x-transition x-cloak class="absolute right-0 bottom-full mb-2 w-48 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
                                 <div class="p-2 text-left">
                                     <button @click="showRegisterModal = true; menuOpen = false" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
-                                        </svg>
                                         Add Student
                                     </button>
 
-                                    <button @click="showEditClassModal = true; menuOpen = false" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-                                        </svg>
+                                    <button @click="
+                                        selectedClassId = cls.id;
+                                        editFormData = {
+                                            course: cls.course,
+                                            room: cls.room,
+                                            term: cls.term,
+                                            class_time: cls.class_time,
+                                        };
+                                        showEditClassModal = true;
+                                        menuOpen = false;
+                                    " class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition cursor-pointer">
                                         Edit Class
                                     </button>
 
-                                    <div class="h-px bg-gray-100 my-1 mx-2"></div>
-
-                                    <button
-                                        @click="
-                                            selectedClassId = cls.id;
-                                            selectedClassName = cls.course;
-                                            showEndClassModal = true;
-                                            menuOpen = false;
-                                            console.log('Class ID:', selectedClassId, 'Class:', selectedClassName);
-                                        "
-                                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl transition cursor-pointer"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1 0 12.728 0M12 3v9" />
-                                        </svg>
+                                    <button @click="
+                                        selectedClassId = cls.id;
+                                        selectedClassName = cls.course;
+                                        showEndClassModal = true;
+                                        menuOpen = false;
+                                    " class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl transition cursor-pointer">
                                         Delete Class
                                     </button>
                                 </div>
@@ -254,11 +252,11 @@
         </template>
     </div>
 
-    {{-- import modals --}}
+    {{-- Import Modals --}}
     <x-modal-add-class />
     <x-modal-register-student />
-    <x-modal-edit-class/>
-    <x-modal-end-class/>
+    <x-modal-edit-class />
+    <x-modal-end-class />
 
 </div>
 @endsection
