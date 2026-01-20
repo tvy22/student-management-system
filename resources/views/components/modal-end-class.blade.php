@@ -1,6 +1,10 @@
 {{-- end class modal --}}
 
-<div x-show="showEndClassModal" x-cloak class="fixed inset-0 z-100 overflow-y-auto">
+<div x-show="showEndClassModal"
+     x-cloak
+     class="fixed inset-0 z-100 overflow-y-auto">
+
+    {{-- Backdrop --}}
     <div x-show="showEndClassModal" x-transition.opacity @click="showEndClassModal = false" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
 
     <div class="relative min-h-screen flex items-center justify-center p-4 text-center">
@@ -17,24 +21,23 @@
                 </svg>
             </div>
 
-            <h2 class="text-2xl font-black text-slate-800 mb-2">End this Class?</h2>
-            <p class="text-slate-400 font-bold mb-8">
-                This will move <span class="text-slate-800">Mathematics Advanced</span> to the archives. You won't be able to take new attendance for it.
-            </p>
+            <h2 class="text-2xl font-black text-slate-800 mb-2">Delete this Class?</h2>
+<p class="text-slate-400 font-bold mb-8">
+    Are you sure you want to delete class
+    <span x-text="selectedClassName || 'this class'" class="text-slate-900 font-black"></span>?
+    This action cannot be undone.
+</p>
 
             {{-- Action Buttons --}}
-            <form action="#" method="POST" class="flex flex-col gap-3">
-                @csrf
-                @method('DELETE')
-
-                <button type="submit" class="w-full py-4 bg-red-500 hover:bg-red-600 text-white font-black rounded-2xl shadow-lg shadow-red-100 transition-all transform active:scale-[0.98] cursor-pointer">
-                    Yes, End Class
+            <div class="flex flex-col gap-3">
+                <button @click="deleteClass()" type="button" class="w-full py-4 bg-red-500 hover:bg-red-600 text-white font-black rounded-2xl shadow-lg shadow-red-100 transition-all transform active:scale-[0.98] cursor-pointer">
+                    Yes, Delete Class
                 </button>
 
                 <button type="button" @click="showEndClassModal = false" class="w-full py-4 bg-slate-50 text-slate-400 font-bold rounded-2xl hover:bg-slate-100 transition cursor-pointer">
                     Cancel
                 </button>
-            </form>
+            </div>
         </div>
     </div>
 </div>

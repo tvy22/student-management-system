@@ -1,4 +1,4 @@
-  {{-- dashboard home page --}}
+{{-- dashboard home page --}}
 
 @extends('layouts.app')
 
@@ -12,6 +12,8 @@
     showRegisterModal: false,
     showEditClassModal: false,
     showEndClassModal: false,
+    selectedClassId: null,
+    selectedClassName: '',
     classes: [],
     totalStudents: 0,
 
@@ -32,10 +34,8 @@
 
             if (response.ok) {
                 const result = await response.json();
-                // Access the 'data' key from your API response
                 this.classes = result.data || [];
 
-                // Calculate total students based on the length of the students array
                 this.totalStudents = this.classes.reduce((sum, cls) => {
                     return sum + (cls.students ? cls.students.length : 0);
                 }, 0);
@@ -49,13 +49,43 @@
         }
     },
 
+    {{-- delete function --}}
+    async deleteClass() {
+        if (!this.selectedClassId) {
+            alert('No class selected');
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/api/class/${this.selectedClassId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('school_token')}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                console.log('Class Deleted Successfully!');
+                this.showEndClassModal = false;
+                await this.fetchClasses();
+            } else {
+                const errorData = await response.json();
+                alert('Error: ' + (errorData.message || 'Failed to delete'));
+            }
+        } catch (error) {
+            console.error('Delete Error:', error);
+            alert('Network error. Check if API is running on port 8001.');
+        }
+    },
+
     get filteredClasses() {
         return this.classes.filter(c =>
             c.course.toLowerCase().includes(this.search.toLowerCase()) ||
             c.room.toLowerCase().includes(this.search.toLowerCase())
         );
     }
-
 }">
 
     {{-- stats cards --}}
@@ -77,7 +107,7 @@
         <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
             <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center shrink-0">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 015.25 0z" />
                 </svg>
             </div>
             <div>
@@ -111,11 +141,13 @@
         </button>
     </div>
 
-    {{-- if there is no class yet or no search results --}}
+    {{-- loading spinner --}}
     <div x-show="loading" class="col-span-full py-20 flex justify-center" x-cloak>
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
     </div>
-    <div x-show="filteredClasses.length === 0" class="col-span-full py-20 flex flex-col items-center justify-center bg-white rounded-[3rem] border-2 border-dashed border-slate-100" x-cloak>
+
+    {{-- empty state --}}
+    <div x-show="!loading && filteredClasses.length === 0" class="col-span-full py-20 flex flex-col items-center justify-center bg-white rounded-[3rem] border-2 border-dashed border-slate-100" x-cloak>
         <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -129,7 +161,7 @@
     </div>
 
     {{-- class cards grid --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div x-show="!loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <template x-for="cls in filteredClasses" :key="cls.id">
             <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group">
                 <div class="p-5 bg-slate-100 border-b border-gray-100 group-hover:bg-blue-200 transition-colors">
@@ -150,7 +182,7 @@
                         </div>
                         <div>
                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Teacher</p>
-                            <p class="text-sm font-bold text-slate-700" x-text="user.name"></p>
+                            <p class="text-sm font-bold text-slate-700" x-text="JSON.parse(localStorage.getItem('user_data')).user.name"></p>
                         </div>
                         <div>
                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Time</p>
@@ -161,7 +193,7 @@
                     <div class="mt-6 pt-4 border-t border-dashed border-gray-200 flex items-center justify-between gap-2">
                         <a href="/student" class="flex-1 flex items-center justify-center gap-1.5 px-2 py-3 bg-blue-50 text-blue-700 rounded-xl font-bold text-[10px] hover:bg-blue-100 transition active:scale-95 group uppercase tracking-tighter whitespace-nowrap">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0z" />
                             </svg>
                             <span>Students</span>
                         </a>
@@ -198,11 +230,20 @@
 
                                     <div class="h-px bg-gray-100 my-1 mx-2"></div>
 
-                                    <button @click="showEndClassModal = true; menuOpen = false" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl transition">
+                                    <button
+                                        @click="
+                                            selectedClassId = cls.id;
+                                            selectedClassName = cls.course;
+                                            showEndClassModal = true;
+                                            menuOpen = false;
+                                            console.log('Class ID:', selectedClassId, 'Class:', selectedClassName);
+                                        "
+                                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl transition cursor-pointer"
+                                    >
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1 0 12.728 0M12 3v9" />
                                         </svg>
-                                        End Class
+                                        Delete Class
                                     </button>
                                 </div>
                             </div>
