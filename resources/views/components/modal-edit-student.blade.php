@@ -7,9 +7,9 @@
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 scale-95"
              x-transition:enter-end="opacity-100 scale-100"
-             class="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden">
+             class="relative bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden"> {{-- Width set to max-w-md to match others --}}
 
-            {{-- Header matches Edit Class Style --}}
+            {{-- Header --}}
             <div class="p-8 bg-amber-50 border-b border-amber-100 flex justify-between items-center">
                 <div>
                     <h2 class="text-2xl font-black text-amber-900">Edit Student</h2>
@@ -25,76 +25,37 @@
                 @csrf
                 @method('PUT')
 
-                {{-- Picture Upload Area --}}
-                <div class="flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-3xl p-6 bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer relative">
-                    <input type="file" name="profile_pic" class="absolute inset-0 opacity-0 cursor-pointer">
-                    <div class="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-2 border border-amber-100">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
+                <div class="space-y-5">
+                    {{-- Full Name --}}
+                    <div>
+                        <label class="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Full Name</label>
+                        <input type="text" name="name" value="John Doe" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-amber-500 focus:bg-white outline-none transition font-bold text-slate-700">
+                        @error('name')
+                            <span class="text-[10px] font-black text-red-500 uppercase tracking-tight ml-2 mt-1 block">{{ $message }}</span>
+                        @enderror
                     </div>
-                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Change Student Photo</p>
+
+                    {{-- Email --}}
+                    <div>
+                        <label class="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Email</label>
+                        <input type="text" name="email" value="john@gmail.com" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-amber-500 focus:bg-white outline-none transition font-bold text-slate-700">
+                        @error('email')
+                            <span class="text-[10px] font-black text-red-500 uppercase tracking-tight ml-2 mt-1 block">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    {{-- Phone Number --}}
+                    <div>
+                        <label class="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Phone Number</label>
+                        <input type="text" name="phone" value="012 345 678" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-amber-500 focus:bg-white outline-none transition font-bold text-slate-700">
+                        @error('phone')
+                            <span class="text-[10px] font-black text-red-500 uppercase tracking-tight ml-2 mt-1 block">{{ $message }}</span>
+                        @enderror
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-
-                    <div class="space-y-6">
-                        {{-- Full Name --}}
-                        <div>
-                            <label class="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Full Name</label>
-                            <input type="text" name="name" value="John Doe" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-amber-500 focus:bg-white outline-none transition font-bold text-slate-700">
-                            @error('name')
-                                <span class="text-[10px] font-black text-red-500 uppercase tracking-tight ml-2 mt-1 block">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        {{-- Gender --}}
-                        <div>
-                            <label class="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Gender</label>
-                            <div class="relative">
-                                <select name="gender" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-amber-500 focus:bg-white outline-none transition font-bold appearance-none text-slate-700">
-                                    <option value="Male" selected>Male</option>
-                                    <option value="Female">Female</option>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
-                                </div>
-                                @error('gender')
-                                    <span class="text-[10px] font-black text-red-500 uppercase tracking-tight ml-2 mt-1 block">{{ $message }}</span>
-                                @enderror
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-6">
-                        {{-- Phone Number --}}
-                        <div>
-                            <label class="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Phone Number</label>
-                            <input type="text" name="phone" value="012 345 678" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-amber-500 focus:bg-white outline-none transition font-bold text-slate-700">
-                            @error('phone')
-                                <span class="text-[10px] font-black text-red-500 uppercase tracking-tight ml-2 mt-1 block">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        {{-- Assign to Class --}}
-                        <div>
-                            <label class="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Assign to Class</label>
-                            <div class="relative">
-                                <select name="class_id" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-amber-500 focus:bg-white outline-none transition font-bold appearance-none text-slate-700">
-                                    <option value="1" selected>Advanced Mathematics</option>
-                                    <option value="2">Physics 101</option>
-                                    <option value="3">World History</option>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="pt-4 flex gap-3">
+                {{-- Action Buttons --}}
+                <div class="pt-2 flex gap-3">
                     <button type="button" @click="showEditStudentModal = false" class="flex-1 py-4 bg-gray-100 text-gray-500 font-bold rounded-2xl hover:bg-gray-200 transition cursor-pointer">
                         Cancel
                     </button>
