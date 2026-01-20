@@ -7,30 +7,55 @@
 
 <div x-data="{
     search: '',
+    loading: true,
     showAddClassModal: false,
     showRegisterModal: false,
     showEditClassModal: false,
     showEndClassModal: false,
-    {{-- Fake Class Data --}}
-    classes: [
-        {
-            id: 1,
-            name: 'Mathematics Advanced',
-            status: 'Active',
-            term: 'Sat - Sun',
-            room: 'Room 302',
-            teacher: 'Dr. Sarah Jenkins',
-            time: '08:00 - 10:00'
+    classes: [],
+    totalStudents: 0,
+
+    async init() {
+        await this.fetchClasses();
+    },
+
+    async fetchClasses() {
+        this.loading = true;
+        try {
+            const response = await fetch('http://127.0.0.1:8000/api/class', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('school_token')}`,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                // Access the 'data' key from your API response
+                this.classes = result.data || [];
+
+                // Calculate total students based on the length of the students array
+                this.totalStudents = this.classes.reduce((sum, cls) => {
+                    return sum + (cls.students ? cls.students.length : 0);
+                }, 0);
+            } else {
+                console.error('Failed to fetch classes');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            this.loading = false;
         }
-    ],
-    {{-- Filter Logic --}}
+    },
+
     get filteredClasses() {
         return this.classes.filter(c =>
-            c.name.toLowerCase().includes(this.search.toLowerCase()) ||
-            c.teacher.toLowerCase().includes(this.search.toLowerCase()) ||
+            c.course.toLowerCase().includes(this.search.toLowerCase()) ||
             c.room.toLowerCase().includes(this.search.toLowerCase())
         );
     }
+
 }">
 
     {{-- stats cards --}}
@@ -44,7 +69,7 @@
             </div>
             <div>
                 <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Classes</p>
-                <p class="text-2xl font-black text-slate-800" x-text="classes.length.toString().padStart(2, '0')">08</p>
+                <p class="text-2xl font-black text-slate-800" x-text="classes.length.toString().padStart(2, '0')">00</p>
             </div>
         </div>
 
@@ -57,7 +82,7 @@
             </div>
             <div>
                 <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Students</p>
-                <p class="text-2xl font-black text-slate-800">240</p>
+                <p class="text-2xl font-black text-slate-800" x-text="totalStudents">00</p>
             </div>
         </div>
     </div>
@@ -87,6 +112,9 @@
     </div>
 
     {{-- if there is no class yet or no search results --}}
+    <div x-show="loading" class="col-span-full py-20 flex justify-center" x-cloak>
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    </div>
     <div x-show="filteredClasses.length === 0" class="col-span-full py-20 flex flex-col items-center justify-center bg-white rounded-[3rem] border-2 border-dashed border-slate-100" x-cloak>
         <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -106,8 +134,7 @@
             <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group">
                 <div class="p-5 bg-slate-100 border-b border-gray-100 group-hover:bg-blue-200 transition-colors">
                     <div class="flex justify-between items-center mb-1">
-                        <h3 class="text-xl font-black text-slate-800 leading-tight" x-text="cls.name"></h3>
-                        <span class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded-md uppercase" x-text="cls.status"></span>
+                        <h3 class="text-xl font-black text-slate-800 leading-tight" x-text="cls.course"></h3>
                     </div>
                 </div>
 
@@ -123,11 +150,11 @@
                         </div>
                         <div>
                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Teacher</p>
-                            <p class="text-sm font-bold text-slate-700" x-text="cls.teacher"></p>
+                            <p class="text-sm font-bold text-slate-700" x-text="user.name"></p>
                         </div>
                         <div>
                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Time</p>
-                            <p class="text-sm font-bold text-slate-700" x-text="cls.time"></p>
+                            <p class="text-sm font-bold text-slate-700" x-text="cls.class_time"></p>
                         </div>
                     </div>
 
