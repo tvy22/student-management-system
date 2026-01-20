@@ -1,4 +1,4 @@
-{{-- dashboard home page --}}
+  {{-- dashboard home page --}}
 
 @extends('layouts.app')
 
@@ -58,24 +58,6 @@
             <div>
                 <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Students</p>
                 <p class="text-2xl font-black text-slate-800">240</p>
-            </div>
-        </div>
-
-        {{-- male --}}
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div class="w-12 h-12 bg-cyan-100 text-cyan-600 rounded-2xl flex items-center justify-center shrink-0 font-black">M</div>
-            <div>
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Male</p>
-                <p class="text-2xl font-black text-slate-800">115</p>
-            </div>
-        </div>
-
-        {{-- female --}}
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div class="w-12 h-12 bg-pink-100 text-pink-600 rounded-2xl flex items-center justify-center shrink-0 font-black">F</div>
-            <div>
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Female</p>
-                <p class="text-2xl font-black text-slate-800">125</p>
             </div>
         </div>
     </div>

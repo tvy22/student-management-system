@@ -16,7 +16,41 @@
         [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="antialiased font-sans bg-gray-50 text-gray-900" x-data="{ open: false, showLogoutModal: false }">
+<body class="antialiased font-sans bg-gray-50 text-gray-900"
+      x-data="{
+        open: false,
+        showLogoutModal: false,
+        user: (JSON.parse(localStorage.getItem('user_data')) || { user: { name: 'User' } }).user,
+
+        async handleLogout() {
+              try {
+                  const token = localStorage.getItem('school_token');
+
+                  // 1. Tell the backend to kill the token
+                  await fetch('http://localhost:8000/api/logout', {
+                      method: 'POST',
+                      headers: {
+                          'Authorization': `Bearer ${token}`,
+                          'Accept': 'application/json',
+                          'Content-Type': 'application/json'
+                      }
+                  });
+
+                  // 2. Clear browser memory
+                  localStorage.removeItem('school_token');
+                  localStorage.removeItem('user_data');
+
+                  // 3. Redirect to login
+                  window.location.href = '/';
+              } catch (error) {
+                  console.error('Logout error:', error);
+                  // Force clear and redirect even if server is down
+                  localStorage.clear();
+                  window.location.href = '/';
+              }
+          }
+
+        }">
 
     <div class="flex h-screen overflow-hidden">
 
@@ -43,15 +77,13 @@
             <div class="px-6 mb-6">
                 <div class="flex items-center gap-3 bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/20 shadow-sm">
                     <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-[#554DDE] font-bold shadow-sm">
-                    <img
-                        src="https://ui-avatars.com/api/?name=John+Doe&background=ffffff&color=554DDE"
-                        alt="John Doe"
-                        class="w-10 h-10 rounded-xl object-cover shadow-sm"
-                    >
+                    <img :src="`https://ui-avatars.com/api/?name=${user.name}&background=ffffff&color=554DDE`"
+                        :alt="user.name"
+                        class="w-10 h-10 rounded-xl object-cover shadow-sm">
                     </div>
                     <div class="overflow-hidden">
-                        <p class="text-sm font-bold truncate text-white">Prof. John Doe</p>
-                        <p class="text-[10px] font-bold uppercase opacity-70 text-blue-50">ID: T-1002</p>
+                        <p class="text-sm font-bold truncate text-white" x-text="user.name"></p>
+                        <p class="text-[10px] font-bold uppercase opacity-70 text-blue-50" x-text="'ID: ' + user.id">ID: </p>
                     </div>
                 </div>
             </div>

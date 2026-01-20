@@ -16,20 +16,23 @@
                 </svg>
             </div>
 
-            <h2 class="text-2xl font-black text-slate-800 mb-2">Ready to Leave?</h2>
+            <h2 class="text-2xl font-black text-slate-800 mb-2">Ready to Leave, <span x-text="user.name"></span>?</h2>
             <p class="text-slate-400 font-bold mb-8">
                 Are you sure you want to log out of your session?
             </p>
 
             <div class="flex flex-col gap-3">
-                <form action="#" method="POST">
-                    @csrf
-                    <button type="submit" class="w-full py-4 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-red-500 hover:to-red-600 text-white font-black rounded-2xl shadow-lg shadow-indigo-100 transition-all transform active:scale-[0.98] cursor-pointer">
-                        Yes, Logout
-                    </button>
-                </form>
+                <button
+                    @click.prevent="handleLogout()"
+                    type="button"
+                    class="w-full py-4 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-red-500 hover:to-red-600 text-white font-black rounded-2xl shadow-lg shadow-indigo-100 transition-all transform active:scale-[0.98] cursor-pointer">
+                    Yes, Logout
+                </button>
 
-                <button type="button" @click="showLogoutModal = false" class="w-full py-4 bg-slate-50 text-slate-400 font-bold rounded-2xl hover:bg-slate-100 transition cursor-pointer">
+                <button
+                    type="button"
+                    @click="showLogoutModal = false"
+                    class="w-full py-4 bg-slate-50 text-slate-400 font-bold rounded-2xl hover:bg-slate-100 transition cursor-pointer">
                     Stay Logged In
                 </button>
             </div>
