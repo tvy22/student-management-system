@@ -18,11 +18,6 @@
                 body: JSON.stringify(this.formData)
             });
 
-            {{-- if (response.ok) {
-                this.showAddClassModal = false;
-                await this.fetchClasses(); // Refresh the list on the dashboard
-            } --}}
-
             if (response.ok) {
                 this.showAddClassModal = false;
                 await this.fetchClasses();
