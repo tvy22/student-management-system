@@ -226,7 +226,7 @@
                     </div>
 
                     <div class="mt-6 pt-4 border-t border-dashed border-gray-200 flex items-center justify-between gap-2">
-                        <a href="/student" class="flex-1 flex items-center justify-center gap-1.5 px-2 py-3 bg-blue-50 text-blue-700 rounded-xl font-bold text-[10px] hover:bg-blue-100 transition active:scale-95 group uppercase tracking-tighter whitespace-nowrap">
+                        <a :href="'/student/' + cls.id" class="flex-1 flex items-center justify-center gap-1.5 px-2 py-3 bg-blue-50 text-blue-700 rounded-xl font-bold text-[10px] hover:bg-blue-100 transition active:scale-95 group uppercase tracking-tighter whitespace-nowrap">
                             <span>Students</span>
                         </a>
 

@@ -25,7 +25,7 @@ Route::get("/dashboard", function(){
 });
 
 //view student from class card
-Route::get("/student", function(){
+Route::get("/student/{id}", function(){
     return view('students.index');
 });
 
