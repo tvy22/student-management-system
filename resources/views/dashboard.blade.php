@@ -174,12 +174,12 @@
     {{-- Class Cards Grid --}}
     <div x-show="!loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <template x-for="cls in filteredClasses" :key="cls.id">
-            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group">
-                <div class="p-5 bg-slate-100 border-b border-gray-100 group-hover:bg-blue-200 transition-colors">
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-300 overflow-hidden hover:shadow-xl transition-all duration-300 group">
+                <div class="p-5 bg-blue-200 border-b border-gray-100 group-hover:bg-blue-300 transition-colors">
                     <h3 class="text-xl font-black text-slate-800 leading-tight" x-text="cls.course"></h3>
                 </div>
 
-                <div class="p-6">
+                <div class="p-6 ">
                     <div class="grid grid-cols-2 gap-y-4 gap-x-2">
                         <div>
                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Term</p>
@@ -220,14 +220,14 @@
                                     {{-- <button @click="showRegisterModal = true; menuOpen = false" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition">
                                         Add Student
                                     </button> --}}
-<button @click="
-    selectedClassId = cls.id;
-    console.log('Class ID: ', selectedClassId);
-    showRegisterModal = true;
-    menuOpen = false"
-    class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition">
-    Add Student
-</button>
+                                    <button @click="
+                                        selectedClassId = cls.id;
+                                        console.log('Class ID: ', selectedClassId);
+                                        showRegisterModal = true;
+                                        menuOpen = false"
+                                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition">
+                                        Add Student
+                                    </button>
 
                                     <button @click="
                                         selectedClassId = cls.id;

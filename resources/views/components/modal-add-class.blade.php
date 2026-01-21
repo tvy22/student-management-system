@@ -18,10 +18,32 @@
                 body: JSON.stringify(this.formData)
             });
 
-            if (response.ok) {
+            {{-- if (response.ok) {
                 this.showAddClassModal = false;
                 await this.fetchClasses(); // Refresh the list on the dashboard
+            } --}}
+
+            if (response.ok) {
+                this.showAddClassModal = false;
+                await this.fetchClasses();
+
+                // --- SUCCESS POPUP ---
+                Swal.fire({
+                    title: 'Class Added Successfully!',
+                    icon: 'success',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'Ok',
+                    customClass: {
+                        popup: 'rounded-[3rem]',
+                        confirmButton: 'rounded-xl font-bold px-6 py-3'
+                    }
+                });
+
+                // ---------------------
+            } else {
+                this.errorMessage = data.message || 'Registration failed.';
             }
+
         } catch (error) {
             console.error('Submission failed:', error);
         }
