@@ -7,16 +7,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Register - SkillTech</title>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="antialiased font-sans bg-gray-100 flex items-center justify-center min-h-screen p-4 sm:p-6"
-    {{-- 1. Matches Login Style: Initialize Alpine Data --}}
     x-data="{
         name: '',
         email: '',
         password: '',
         errorMessage: '',
         loading: false,
+
         async handleRegister() {
             this.loading = true;
             this.errorMessage = '';
@@ -37,11 +38,25 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    // On success, redirect to login (or you can auto-login them)
-                    window.location.href = '/';
+                    // --- SUCCESS POPUP ---
+                    Swal.fire({
+                        title: 'Registered Successfully!',
+                        text: 'Please login to continue.',
+                        icon: 'success',
+                        confirmButtonColor: '#2563eb',
+                        confirmButtonText: 'Go to Login',
+                        customClass: {
+                            popup: 'rounded-[3rem]',
+                            confirmButton: 'rounded-xl font-bold px-6 py-3'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '/'; // Redirect after clicking button
+                        }
+                    });
+                    // ---------------------
                 } else {
-                    // Handle Laravel validation errors or existing user
-                    this.errorMessage = data.message || 'Registration failed. Please check your details.';
+                    this.errorMessage = data.message || 'Registration failed.';
                 }
             } catch (err) {
                 this.errorMessage = 'Connection failed.';
