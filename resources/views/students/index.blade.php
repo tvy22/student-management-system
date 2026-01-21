@@ -7,6 +7,8 @@
     loading: true,
     showRegisterModal: false,
     showEditStudentModal: false,
+    showDeleteStudentModal: false,
+    selectedStudentToDelete: { id: null, name: '' },
     selectedClassId: null,
     classInfo: { course_name: 'Loading...', room: '', term: '' },
     students: [],
@@ -41,6 +43,20 @@
         window.addEventListener('close-edit-student', () => {
             this.showEditStudentModal = false;
         });
+
+        window.addEventListener('open-delete-student', (e) => {
+            const studentId = e.detail;
+            const student = this.students.find(s => s.id === studentId);
+            if (student) {
+                this.selectedStudentToDelete = { id: student.id, name: student.name };
+                this.showDeleteStudentModal = true;
+            }
+        });
+
+        window.addEventListener('close-delete-student', () => {
+            this.showDeleteStudentModal = false;
+        });
+
     },
 
     async fetchStudents() {

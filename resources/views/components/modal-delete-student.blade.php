@@ -1,6 +1,39 @@
 {{-- delete student modal --}}
 
-<div x-show="showDeleteStudentModal" x-cloak class="fixed inset-0 z-100 overflow-y-auto">
+<div
+x-data="{
+    isDeleting: false,
+    async deleteStudent() {
+        this.isDeleting = true;
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/api/student/${selectedStudentToDelete.id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('school_token')}`,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                Swal.fire({
+                    title: 'Deleted!',
+                    text: 'The student record has been removed.',
+                    icon: 'success',
+                    confirmButtonColor: '#f43f5e'
+                });
+                window.dispatchEvent(new CustomEvent('refresh-student-list'));
+                this.showDeleteStudentModal = false;
+            } else {
+                alert('Failed to delete student.');
+            }
+        } catch (error) {
+            console.error('Delete error:', error);
+        } finally {
+            this.isDeleting = false;
+        }
+    }
+}"
+x-show="showDeleteStudentModal" x-cloak class="fixed inset-0 z-100 overflow-y-auto">
     {{-- Backdrop --}}
     <div x-show="showDeleteStudentModal" x-transition.opacity @click="showDeleteStudentModal = false" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
 
@@ -33,7 +66,7 @@
             <div class="p-8 text-center">
                 <p class="text-slate-600 font-bold mb-2">Are you sure you want to delete this student?</p>
                 <div class="inline-block px-4 py-2 bg-slate-50 rounded-xl border border-slate-100 mb-6">
-                    <span class="text-slate-800 font-black text-lg">John Doe</span>
+                    <span class="text-slate-800 font-black text-lg" x-text="selectedStudentToDelete.name"></span>
                 </div>
                 <p class="text-xs text-slate-400 font-medium leading-relaxed">
                     This action cannot be undone. All attendance history associated with this student will be permanently removed from the system.
@@ -45,13 +78,17 @@
                 <button type="button" @click="showDeleteStudentModal = false" class="flex-1 py-4 bg-gray-100 text-gray-500 font-bold rounded-2xl hover:bg-gray-200 transition cursor-pointer">
                     Cancel
                 </button>
-                <form action="#" method="POST" class="flex-2">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="w-full py-4 bg-rose-500 hover:bg-rose-600 text-white font-black rounded-2xl shadow-lg shadow-rose-200 transition-all transform active:scale-[0.98] cursor-pointer">
-                        Yes, Delete Student
+                <div class="flex-2">
+                    <button
+                        @click="deleteStudent"
+                        :disabled="isDeleting"
+                        type="button"
+                        class="w-full py-4 bg-rose-500 hover:bg-rose-600 text-white font-black rounded-2xl shadow-lg shadow-rose-200 transition-all transform active:scale-[0.98] cursor-pointer flex justify-center items-center"
+                    >
+                        <span x-show="!isDeleting">Yes, Delete Student</span>
+                        <div x-show="isDeleting" class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
                     </button>
-                </form>
+                </div>
             </div>
         </div>
     </div>
