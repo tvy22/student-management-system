@@ -6,6 +6,7 @@
     search: '',
     loading: true,
     showRegisterModal: false,
+    showEditStudentModal: false,
     selectedClassId: null,
     classInfo: { course_name: 'Loading...', room: '', term: '' },
     students: [],
@@ -29,6 +30,16 @@
 
         window.addEventListener('close-register-modal', () => {
             this.showRegisterModal = false;
+        });
+
+        // Listener for the Open Edit Modal signal
+        window.addEventListener('open-edit-student', (e) => {
+            this.showEditStudentModal = true;
+        });
+
+        // Listener for the Close Edit Modal signal
+        window.addEventListener('close-edit-student', () => {
+            this.showEditStudentModal = false;
         });
     },
 
