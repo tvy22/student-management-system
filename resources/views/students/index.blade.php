@@ -75,9 +75,8 @@
                 <thead>
                     <tr class="bg-slate-800 text-white">
                         <th class="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em]">Student ID</th>
-                        <th class="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em]">Profile</th>
                         <th class="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em]">Full Name</th>
-                        <th class="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em]">Gender</th>
+                        <th class="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em]">Email</th>
                         <th class="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em]">Phone Number</th>
                         <th class="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-center">Actions</th>
                     </tr>
@@ -90,28 +89,14 @@
                                 <span class="font-mono font-black text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg text-xs" x-text="student.id"></span>
                             </td>
 
-                            {{-- student profile pic --}}
+                            {{-- name --}}
                             <td class="px-8 py-5">
-                                <div class="w-12 h-12 rounded-2xl bg-slate-100 border-2 border-white shadow-sm flex items-center justify-center overflow-hidden">
-                                    <img
-                                        src="https://ui-avatars.com/api/?name=John+Doe&background=random"
-                                        alt="Profile"
-                                        class="w-full h-full object-cover"
-                                    >
-                                </div>
+                                <span class="font-bold text-slate-600" x-text="student.name"></span>
                             </td>
 
-                            {{-- name and email --}}
+                            {{-- email --}}
                             <td class="px-8 py-5">
-                                <div>
-                                    <p class="font-black text-slate-800 text-base" x-text="student.name"></p>
-                                    <p class="text-xs font-bold text-slate-400" x-text="student.email"></p>
-                                </div>
-                            </td>
-
-                            {{-- gender --}}
-                            <td class="px-8 py-5">
-                                <span class="font-bold text-slate-600" x-text="student.gender"></span>
+                                <span class="font-bold text-slate-600" x-text="student.email"></span>
                             </td>
 
                             {{-- phone --}}
