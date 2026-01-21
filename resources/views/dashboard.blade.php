@@ -217,9 +217,17 @@
 
                             <div x-show="menuOpen" x-transition x-cloak class="absolute right-0 bottom-full mb-2 w-48 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
                                 <div class="p-2 text-left">
-                                    <button @click="showRegisterModal = true; menuOpen = false" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition">
+                                    {{-- <button @click="showRegisterModal = true; menuOpen = false" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition">
                                         Add Student
-                                    </button>
+                                    </button> --}}
+<button @click="
+    selectedClassId = cls.id;
+    console.log('Class ID: ', selectedClassId);
+    showRegisterModal = true;
+    menuOpen = false"
+    class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition">
+    Add Student
+</button>
 
                                     <button @click="
                                         selectedClassId = cls.id;

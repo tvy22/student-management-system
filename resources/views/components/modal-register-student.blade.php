@@ -1,4 +1,49 @@
-<div x-show="showRegisterModal" x-cloak class="fixed inset-0 z-100 overflow-y-auto">
+<div x-show="showRegisterModal" x-cloak
+    class="fixed inset-0 z-100 overflow-y-auto"
+    x-data="{
+        studentForm: { name: '', email: '', phone: '' },
+        isSubmitting: false,
+
+        async submitStudent() {
+            this.isSubmitting = true;
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/student', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('school_token')}`,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        ...this.studentForm,
+                        class_id: selectedClassId
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Student registered and enrolled.',
+                        icon: 'success',
+                        confirmButtonColor: '#2563eb',
+                        customClass: { popup: 'rounded-[2.5rem]' }
+                    });
+                    showRegisterModal = false;
+                    this.studentForm = { name: '', email: '', phone: '' };
+                    await fetchClasses();
+                } else {
+                    alert(result.message || 'Error occurred');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                this.isSubmitting = false;
+            }
+        }
+    }">
+
     {{-- Backdrop --}}
     <div x-show="showRegisterModal" x-transition.opacity @click="showRegisterModal = false" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
 
@@ -7,7 +52,7 @@
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 scale-95"
              x-transition:enter-end="opacity-100 scale-100"
-             class="relative bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden"> {{-- Changed from max-w-2xl to max-w-md --}}
+             class="relative bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden">
 
             {{-- Header --}}
             <div class="p-8 bg-blue-300 border-b border-gray-100 flex justify-between items-center">
@@ -21,43 +66,33 @@
             </div>
 
             {{-- Form Body --}}
-            <form action="#" method="POST" enctype="multipart/form-data" class="p-8 space-y-6"> {{-- Increased space-y-2 to space-y-6 for better gaps --}}
+            <form @submit.prevent="submitStudent" class="p-8 space-y-6">
                 @csrf
 
                 <div class="space-y-5">
-
                     {{-- Full Name --}}
                     <div>
                         <label class="block text-xs font-black text-red-400 uppercase mb-2 ml-1">Full Name</label>
-                        <input type="text" name="name" placeholder="John Doe" value="{{ old('name') }}" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition font-bold text-slate-700">
-                        @error('name')
-                            <span class="text-[10px] font-black text-red-500 uppercase tracking-tight ml-2 mt-1 block">{{ $message }}</span>
-                        @enderror
+                        <input x-model="studentForm.name" type="text" name="name" placeholder="John Doe" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition font-bold text-slate-700" required>
                     </div>
 
                     {{-- Email --}}
                     <div>
                         <label class="block text-xs font-black text-red-400 uppercase mb-2 ml-1">Email</label>
-                        <input type="text" name="email" placeholder="john@gmail.com" value="{{ old('email') }}" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition font-bold text-slate-700">
-                        @error('email')
-                            <span class="text-[10px] font-black text-red-500 uppercase tracking-tight ml-2 mt-1 block">{{ $message }}</span>
-                        @enderror
+                        <input x-model="studentForm.email" type="email" name="email" placeholder="john@gmail.com" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition font-bold text-slate-700" required>
                     </div>
 
                     {{-- Phone Number --}}
                     <div>
                         <label class="block text-xs font-black text-red-400 uppercase mb-2 ml-1">Phone Number</label>
-                        <input type="text" name="phone" placeholder="012 345 678" value="{{ old('phone') }}" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition font-bold text-slate-700">
-                        @error('phone')
-                            <span class="text-[10px] font-black text-red-500 uppercase tracking-tight ml-2 mt-1 block">{{ $message }}</span>
-                        @enderror
+                        <input x-model="studentForm.phone" type="text" name="phone" placeholder="012 345 678" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition font-bold text-slate-700" required>
                     </div>
-
                 </div>
 
                 <div class="pt-2">
-                    <button type="submit" class="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-lg shadow-blue-200 transition-all transform active:scale-[0.98] cursor-pointer">
-                        Complete Registration
+                    <button type="submit" :disabled="isSubmitting" class="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-lg shadow-blue-200 transition-all transform active:scale-[0.98] cursor-pointer flex justify-center items-center">
+                        <span x-show="!isSubmitting">Complete Registration</span>
+                        <span x-show="isSubmitting" class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
                     </button>
                 </div>
             </form>
