@@ -33,6 +33,7 @@
                     showRegisterModal = false;
                     this.studentForm = { name: '', email: '', phone: '' };
                     await fetchClasses();
+
                 } else {
                     alert(result.message || 'Error occurred');
                 }
