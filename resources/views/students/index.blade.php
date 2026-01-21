@@ -16,6 +16,20 @@
     async init() {
         await this.fetchStudents();
 
+        // Listen for the refresh signal
+        window.addEventListener('refresh-student-list', async () => {
+            await this.fetchStudents();
+        });
+
+        // Listen for the open modal signal
+        window.addEventListener('open-register-modal', (e) => {
+            this.selectedClassId = e.detail.id;
+            this.showRegisterModal = true;
+        });
+
+        window.addEventListener('close-register-modal', () => {
+            this.showRegisterModal = false;
+        });
     },
 
     async fetchStudents() {
@@ -70,10 +84,11 @@
                 </a>
 
                 {{-- Add Student (Now passes classId to the modal) --}}
-                <button @click="
+                <button
+                    @click="
                     selectedClassId = classInfo.id;
                     console.log('Class ID: ', selectedClassId);
-                    showRegisterModal = true;"
+                    window.dispatchEvent(new CustomEvent('open-register-modal', { detail: { id: selectedClassId } }))"
                     class="flex-1 md:flex-none bg-blue-600 text-white font-black py-4 px-8 rounded-2xl shadow-lg hover:-translate-y-1 transition-all flex items-center justify-center gap-2 cursor-pointer">
                     Add Student
                 </button>

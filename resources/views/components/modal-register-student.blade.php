@@ -3,6 +3,14 @@
     x-data="{
         studentForm: { name: '', email: '', phone: '' },
         isSubmitting: false,
+        localClassId: null,
+
+        init() {
+            // Capture the class ID when the parent opens this modal
+            window.addEventListener('open-register-modal', (e) => {
+                this.localClassId = e.detail.id;
+            });
+        },
 
         async submitStudent() {
             this.isSubmitting = true;
@@ -30,8 +38,11 @@
                         confirmButtonColor: '#2563eb',
                         customClass: { popup: 'rounded-[2.5rem]' }
                     });
-                    showRegisterModal = false;
                     this.studentForm = { name: '', email: '', phone: '' };
+                    
+                    window.dispatchEvent(new CustomEvent('refresh-student-list'));
+                    window.dispatchEvent(new CustomEvent('close-register-modal'));
+
                     await fetchClasses();
 
                 } else {
