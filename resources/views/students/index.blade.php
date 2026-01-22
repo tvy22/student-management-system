@@ -114,14 +114,20 @@
                     Attendance
                 </a>
 
-                {{-- Add Student (Now passes classId to the modal) --}}
+                {{-- Add New Student (Now passes classId to the modal) --}}
                 <button
                     @click="
                     selectedClassId = classInfo.id;
                     console.log('Class ID: ', selectedClassId);
                     window.dispatchEvent(new CustomEvent('open-register-modal', { detail: { id: selectedClassId } }))"
                     class="flex-1 md:flex-none bg-blue-600 text-white font-black py-4 px-8 rounded-2xl shadow-lg hover:-translate-y-1 transition-all flex items-center justify-center gap-2 cursor-pointer">
-                    Add Student
+                    Enroll New Student
+                </button>
+
+                {{-- Add Existing Student to Class --}}
+                <button
+                    class="flex-1 md:flex-none bg-sky-400 text-white font-black py-4 px-8 rounded-2xl shadow-lg hover:-translate-y-1 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                    Enroll Existing Student
                 </button>
             </div>
         </div>
