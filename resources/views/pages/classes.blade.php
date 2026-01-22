@@ -9,6 +9,8 @@
         showEditClassModal: false,
         showEndClassModal: false,
         classes: [],
+        selectedClassId: null,
+        selectedClassName: '',
 
         editFormData: {
             id: null,
@@ -32,6 +34,13 @@
                     class_time: cls.time
                 };
                 this.showEditClassModal = true;
+            });
+
+            window.addEventListener('open-delete-class', (event) => {
+                const cls = event.detail;
+                this.selectedClassId = cls.id;
+                this.selectedClassName = cls.name;
+                this.showEndClassModal = true;
             });
 
             // Listen for refresh events (from add/edit modals)
@@ -102,13 +111,45 @@
                             confirmButton: 'rounded-xl font-bold px-6 py-3'
                         }
                     });
-                    
+
                 } else {
                     const error = await response.json();
                     alert('Update failed: ' + (error.message || 'Unknown error'));
                 }
             } catch (error) {
                 console.error('Error updating class:', error);
+            }
+        },
+
+        async deleteClass() {
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/class/${this.selectedClassId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('school_token')}`,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    this.showEndClassModal = false;
+                    await this.fetchClasses();
+
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: 'Class has been deleted successfully.',
+                        icon: 'success',
+                        confirmButtonColor: '#ef4444',
+                        customClass: {
+                            popup: 'rounded-[3rem]',
+                            confirmButton: 'rounded-xl font-bold px-6 py-3'
+                        }
+                    });
+                } else {
+                    alert('Delete failed');
+                }
+            } catch (error) {
+                console.error('Error deleting class:', error);
             }
         },
 
@@ -214,7 +255,7 @@
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                                 </button>
 
-                                                <button @click="$dispatch('open-delete-class', cls.id)" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition cursor-pointer">
+                                                <button @click="$dispatch('open-delete-class', cls)" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition cursor-pointer">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                                 </button>
                                             </div>
