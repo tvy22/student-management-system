@@ -10,8 +10,29 @@
         showEndClassModal: false,
         classes: [],
 
+        editFormData: {
+            id: null,
+            course: '',
+            room: '',
+            term: '',
+            class_time: ''
+        },
+
         async init() {
             await this.fetchClasses();
+
+            // Listen for the edit event dispatched from the table row
+            window.addEventListener('open-edit-class', (event) => {
+                const cls = event.detail;
+                this.editFormData = {
+                    id: cls.id,
+                    course: cls.name, // Mapping 'name' from table back to 'course' for API
+                    room: cls.room,
+                    term: cls.term,
+                    class_time: cls.time
+                };
+                this.showEditClassModal = true;
+            });
 
             // Listen for refresh events (from add/edit modals)
             window.addEventListener('refresh-class-list', async () => {
@@ -46,6 +67,48 @@
                 console.error('Error fetching classes:', error);
             } finally {
                 this.loading = false;
+            }
+        },
+
+        async updateClass() {
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/class/${this.editFormData.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('school_token')}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        course: this.editFormData.course,
+                        room: this.editFormData.room,
+                        term: this.editFormData.term,
+                        class_time: this.editFormData.class_time
+                    })
+                });
+
+                if (response.ok) {
+                    this.showEditClassModal = false;
+                    await this.fetchClasses();
+
+                    // --- SUCCESS POPUP ---
+                    Swal.fire({
+                        title: 'Class Deleted Successfully!',
+                        icon: 'success',
+                        confirmButtonColor: '#2563eb',
+                        confirmButtonText: 'Ok',
+                        customClass: {
+                            popup: 'rounded-[3rem]',
+                            confirmButton: 'rounded-xl font-bold px-6 py-3'
+                        }
+                    });
+                    
+                } else {
+                    const error = await response.json();
+                    alert('Update failed: ' + (error.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error updating class:', error);
             }
         },
 

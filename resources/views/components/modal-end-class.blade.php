@@ -22,11 +22,11 @@
             </div>
 
             <h2 class="text-2xl font-black text-slate-800 mb-2">Delete this Class?</h2>
-<p class="text-slate-400 font-bold mb-8">
-    Are you sure you want to delete class
-    <span x-text="selectedClassName || 'this class'" class="text-slate-900 font-black"></span>?
-    This action cannot be undone.
-</p>
+            <p class="text-slate-400 font-bold mb-8">
+                Are you sure you want to delete class
+                <span x-text="selectedClassName || 'this class'" class="text-slate-900 font-black"></span>?
+                This action cannot be undone.
+            </p>
 
             {{-- Action Buttons --}}
             <div class="flex flex-col gap-3">
