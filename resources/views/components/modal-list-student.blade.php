@@ -4,13 +4,15 @@
         search: '',
         students: [],
         loading: false,
-        localClassId: null,
+        showListModal: false,
+        currentClassId: null,
 
         init() {
             // Listen for the signal to open this specific modal
             window.addEventListener('open-list-student-modal', async (e) => {
-                this.localClassId = e.detail.id;
-                showListModal = true;
+                this.currentClassId = e.detail.id;
+                console.log('Class ID received in modal:', this.currentClassId);
+                this.$data.showListModal = true;
                 await this.fetchStudents();
             });
         },
@@ -43,9 +45,13 @@
         },
 
         async enrollExistingStudent(studentId) {
+
+            if (!this.currentClassId) {
+                console.error('Enrollment failed: No Class ID found');
+                return;
+            }
             try {
-                // Assuming you have a route to link existing student to class
-                const response = await fetch(`http://127.0.0.1:8000/api/student/enroll-existing`, {
+                const response = await fetch(`http://127.0.0.1:8000/api/student/enroll`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -54,7 +60,7 @@
                     },
                     body: JSON.stringify({
                         student_id: studentId,
-                        class_id: this.localClassId
+                        class_id: this.currentClassId
                     })
                 });
 
@@ -65,10 +71,12 @@
                         icon: 'success',
                         confirmButtonColor: '#2563eb'
                     });
-                    showListModal = false;
+                    this.$data.showListModal = false;
                     // Trigger refresh on the Class page
                     window.dispatchEvent(new CustomEvent('refresh-class-details'));
-                    await fetchClasses();
+                    await fetchStudents();
+                }else {
+                    alert(result.message || 'Enrollment failed');
                 }
             } catch (error) {
                 console.error('Enrollment error:', error);
@@ -132,7 +140,7 @@
                                     </div>
                                 </td>
                                 <td class="px-4 py-4 text-right">
-                                    <button @click="enrollExistingStudent(student.id)" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-xs transition active:scale-95 cursor-pointer">
+                                    <button @click="enrollExistingStudent(student.id), console.log('Student ID:', student.id, ', Class ID:', currentClassId)" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-xs transition active:scale-95 cursor-pointer">
                                         Add to Class
                                     </button>
                                 </td>

@@ -8,7 +8,6 @@
     showRegisterModal: false,
     showEditStudentModal: false,
     showDeleteStudentModal: false,
-    showListModal: false,
     selectedStudentToDelete: { id: null, name: '' },
     selectedClassId: null,
     classInfo: { course_name: 'Loading...', room: '', term: '' },
@@ -127,7 +126,7 @@
 
                 {{-- Add Existing Student to Class --}}
                 <button
-                    @click="$dispatch('open-list-student-modal', { id: selectedClassId })"
+                    @click="$dispatch('open-list-student-modal', { id: classId })"
                     class="flex-1 md:flex-none bg-sky-400 text-white font-black py-4 px-8 rounded-2xl shadow-lg hover:-translate-y-1 transition-all flex items-center justify-center gap-2 cursor-pointer">
                     Enroll Existing Student
                 </button>
