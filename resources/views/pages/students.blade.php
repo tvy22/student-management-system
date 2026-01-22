@@ -2,21 +2,86 @@
 
 @section('content')
     <div class="max-w-full mx-auto py-8 px-4"
-         x-data="{
+        x-data="{
             search: '',
+            loading: true,
             showRegisterModal: false,
             showEditStudentModal: false,
             showDeleteStudentModal: false,
-            {{-- Student Data --}}
-            students: [
-                { id: 'STU-942', name: 'Sarah Tan', gender: 'Female', phone: '+60 12-345 6789', classes: ['Math 10A', 'Physics'], joinDate: 'Jan 12, 2026', avatar: 'Sarah+Tan' }
-            ],
-            {{-- Filter Logic --}}
+            selectedStudentToDelete: { id: null, name: '' },
+            students: [],
+
+
+            async init() {
+                await this.fetchStudents();
+
+                // Listen for the refresh signal
+                window.addEventListener('refresh-student-list', async () => {
+                    await this.fetchStudents();
+                });
+
+                // Listen for the open modal signal
+                window.addEventListener('open-register-modal', (e) => {
+                    this.selectedClassId = e.detail.id;
+                    this.showRegisterModal = true;
+                });
+
+                window.addEventListener('close-register-modal', () => {
+                    this.showRegisterModal = false;
+                });
+
+                // Listener for the Open Edit Modal signal
+                window.addEventListener('open-edit-student', (e) => {
+                    this.showEditStudentModal = true;
+                });
+
+                // Listener for the Close Edit Modal signal
+                window.addEventListener('close-edit-student', () => {
+                    this.showEditStudentModal = false;
+                });
+
+                window.addEventListener('open-delete-student', (e) => {
+                    const studentId = e.detail;
+                    const student = this.students.find(s => s.id === studentId);
+                    if (student) {
+                        this.selectedStudentToDelete = { id: student.id, name: student.name };
+                        this.showDeleteStudentModal = true;
+                    }
+                });
+
+                window.addEventListener('close-delete-student', () => {
+                    this.showDeleteStudentModal = false;
+                });
+
+            },
+
+            async fetchStudents() {
+                this.loading = true;
+                try {
+                    const response = await fetch(`http://127.0.0.1:8000/api/student/all`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('school_token')}`,
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        this.students = result.data;       // The students array
+                    }
+                } catch (error) {
+                    console.error('Error fetching students:', error);
+                } finally {
+                    this.loading = false;
+                }
+            },
+
             get filteredStudents() {
                 return this.students.filter(s =>
                     s.name.toLowerCase().includes(this.search.toLowerCase()) ||
-                    s.id.toLowerCase().includes(this.search.toLowerCase())
-                );
+                    s.id.toString().includes(this.search.toLowerCase())
+                )
             }
         }">
 
@@ -48,52 +113,38 @@
         </div>
 
         {{-- Student Table --}}
-        <div class="bg-white rounded-[2.5rem] overflow-hidden border border-slate-200 shadow-sm">
+        <div class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
-                    <thead class="bg-slate-800">
-                        <tr>
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">ID</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">Profile</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">Full Name</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">Gender</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">Phone</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">Enrolled Classes</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">Join Date</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest text-right">Actions</th>
+                    <thead>
+                        <tr class="bg-slate-800 text-white">
+                            <th class="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em]">ID</th>
+                            <th class="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em]">Full Name</th>
+                            <th class="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em]">Email</th>
+                            <th class="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em]">Phone</th>
+                            <th class="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
+                        <template x-if="loading">
+                            <tr><td colspan="5" class="py-20 text-center"><div class="animate-spin inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full"></div></td></tr>
+                        </template>
+
                         <template x-for="student in filteredStudents" :key="student.id">
-                            <tr class="hover:bg-slate-50/80 transition-colors group">
-                                <td class="px-6 py-5">
-                                    <span class="text-[11px] font-black text-slate-500 bg-slate-100 px-2 py-1 rounded-lg" x-text="student.id"></span>
+                            <tr class="hover:bg-blue-50/50 transition-colors group">
+                                <td class="px-8 py-5">
+                                    <span class="font-mono font-black text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg text-xs" x-text="student.id"></span>
                                 </td>
-                                <td class="px-6 py-5">
-                                    <div class="w-10 h-10 rounded-full bg-blue-50 border-2 border-white shadow-sm overflow-hidden">
-                                        <img :src="`https://ui-avatars.com/api/?name=${student.avatar}&background=DBEAFE&color=2563EB&bold=true`" alt="Avatar">
-                                    </div>
-                                </td>
-                                <td class="px-6 py-5">
-                                    <div class="font-bold text-slate-800 text-sm" x-text="student.name"></div>
-                                </td>
-                                <td class="px-6 py-5 text-sm font-bold text-slate-600" x-text="student.gender"></td>
-                                <td class="px-6 py-5 text-sm font-bold text-slate-600 font-mono" x-text="student.phone"></td>
-                                <td class="px-6 py-5">
-                                    <div class="flex flex-wrap gap-1">
-                                        <template x-for="cls in student.classes">
-                                            <span class="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-md text-[10px] font-black uppercase" x-text="cls"></span>
-                                        </template>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-5 text-sm font-bold text-slate-500" x-text="student.joinDate"></td>
-                                <td class="px-6 py-5 text-right">
-                                    <div class="flex justify-end gap-1">
-                                        <button @click="showEditStudentModal = true" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition cursor-pointer">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                <td class="px-8 py-5"><span class="font-bold text-slate-600" x-text="student.name"></span></td>
+                                <td class="px-8 py-5"><span class="font-bold text-slate-600" x-text="student.email"></span></td>
+                                <td class="px-8 py-5"><span class="font-bold text-slate-600" x-text="student.phone"></span></td>
+                                <td class="px-8 py-5 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <button @click="$dispatch('open-edit-student', student.id)" class="p-2.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all cursor-pointer">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                         </button>
-                                        <button @click="showDeleteStudentModal = true" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition cursor-pointer">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        <button @click="$dispatch('open-delete-student', student.id)" class="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                         </button>
                                     </div>
                                 </td>
