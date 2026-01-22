@@ -61,12 +61,11 @@
                         {{-- Dark Header --}}
                         <thead class="bg-slate-800">
                             <tr>
-                                <th class="px-6 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">ID</th>
-                                <th class="px-6 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">Class Name</th>
+                                <th class="px-6 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">Class ID</th>
+                                <th class="px-6 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">Course</th>
                                 <th class="px-6 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">Room</th>
                                 <th class="px-6 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">Term</th>
                                 <th class="px-6 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">Time</th>
-                                <th class="px-6 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">Total Hours</th>
                                 <th class="px-6 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest text-center">Students</th>
                                 <th class="px-6 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest text-right">Actions</th>
                             </tr>
@@ -85,9 +84,6 @@
                                         <span class="px-3 py-1 bg-orange-50 text-orange-600 rounded-full text-[10px] font-black uppercase" x-text="cls.term"></span>
                                     </td>
                                     <td class="px-6 py-5 text-sm font-bold text-slate-600" x-text="cls.time"></td>
-                                    <td class="px-6 py-5">
-                                        <div class="flex items-center gap-1.5 text-sm font-bold text-slate-500" x-text="cls.hours"></div>
-                                    </td>
                                     <td class="px-6 py-5 text-center">
                                         <span class="text-sm font-black text-slate-800" x-text="cls.students"></span>
                                     </td>
