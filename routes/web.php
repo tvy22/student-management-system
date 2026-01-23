@@ -53,3 +53,8 @@ Route::get("/class", function(){
 Route::get("/students", function(){
     return view('pages.students');
 });
+
+//attendances page from dashboard sidebar
+Route::get("/attendances", function(){
+    return view('pages.attendances');
+});

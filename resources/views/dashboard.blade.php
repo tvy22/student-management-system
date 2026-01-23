@@ -248,7 +248,7 @@
                                         console.log('Class ID: ', selectedClassId);
                                         showRegisterModal = true;
                                         menuOpen = false"
-                                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition">
+                                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition cursor-pointer">
                                         Add Student
                                     </button>
 
