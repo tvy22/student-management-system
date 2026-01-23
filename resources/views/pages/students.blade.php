@@ -89,7 +89,7 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
                 <h1 class="text-3xl font-black text-slate-800 tracking-tight">Student Directory</h1>
-                <p class="text-slate-500 font-bold text-sm">Manage and search for students across all departments</p>
+                <p class="text-slate-500 font-bold text-sm">Manage and search for students across all classes</p>
             </div>
 
             <div class="flex items-center gap-3">
