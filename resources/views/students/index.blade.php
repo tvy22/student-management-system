@@ -8,6 +8,7 @@
     showRegisterModal: false,
     showEditStudentModal: false,
     showDeleteStudentModal: false,
+    showTakeAttendanceModal: false,
     selectedStudentToDelete: { id: null, name: '' },
     selectedClassId: null,
     classInfo: { course_name: 'Loading...', room: '', term: '' },
@@ -110,9 +111,9 @@
 
             <div class="flex items-center gap-3 w-full md:w-auto">
                 {{-- Attendance (Pass the class ID) --}}
-                <a href="/take" class="flex-1 md:flex-none bg-emerald-400 text-black font-black py-4 px-8 rounded-2xl shadow-lg hover:-translate-y-1 transition-all flex items-center justify-center gap-2">
+                <button @click="showTakeAttendanceModal= true" class="flex-1 md:flex-none bg-emerald-400 text-black font-black py-4 px-8 rounded-2xl shadow-lg hover:-translate-y-1 transition-all flex items-center justify-center gap-2 cursor-pointer">
                     Attendance
-                </a>
+                </button>
 
                 {{-- Add New Student (Now passes classId to the modal) --}}
                 <button
@@ -198,6 +199,7 @@
     <x-modal-edit-student />
     <x-modal-delete-student />
     <x-modal-list-student />
+    <x-modal-take-class-attendance />
 
 </div>
 @endsection
