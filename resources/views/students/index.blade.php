@@ -9,6 +9,7 @@
     showEditStudentModal: false,
     showDeleteStudentModal: false,
     showTakeAttendanceModal: false,
+    attendanceDate: '{{ date('Y-m-d') }}',
     selectedStudentToDelete: { id: null, name: '' },
     selectedClassId: null,
     classInfo: { course_name: 'Loading...', room: '', term: '' },
