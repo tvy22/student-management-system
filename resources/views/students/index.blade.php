@@ -110,7 +110,7 @@
 
             <div class="flex items-center gap-3 w-full md:w-auto">
                 {{-- Attendance (Pass the class ID) --}}
-                <a :href="'/take/' + classId" class="flex-1 md:flex-none bg-emerald-400 text-black font-black py-4 px-8 rounded-2xl shadow-lg hover:-translate-y-1 transition-all flex items-center justify-center gap-2">
+                <a href="/take" class="flex-1 md:flex-none bg-emerald-400 text-black font-black py-4 px-8 rounded-2xl shadow-lg hover:-translate-y-1 transition-all flex items-center justify-center gap-2">
                     Attendance
                 </a>
 

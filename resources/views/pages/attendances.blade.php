@@ -9,8 +9,8 @@
             filterStudent: '',
             filterClass: '',
             filterDate: '',
+            filterStatus: '', {{-- New Status Filter Variable --}}
 
-            {{-- Updated Mock Data with Modal Fields --}}
             records: [
                 {
                     id: 101, student_id: 5, student_name: 'Nalin',
@@ -36,8 +36,12 @@
                 return this.records.filter(r => {
                     const matchStudent = this.filterStudent === '' || r.student_id.toString() === this.filterStudent;
                     const matchClass = this.filterClass === '' || r.class_id === this.filterClass;
-                    const matchDate = this.filterDate === '' || r.date === this.filterDate;
-                    return matchStudent && matchClass && matchDate;
+                    const matchStatus = this.filterStatus === '' || r.status === this.filterStatus;
+
+                    // This is the magic line
+                    const matchDate = this.filterDate === '' || r.date.startsWith(this.filterDate);
+
+                    return matchStudent && matchClass && matchDate && matchStatus;
                 });
             },
 
@@ -45,6 +49,7 @@
                 this.filterStudent = '';
                 this.filterClass = '';
                 this.filterDate = '';
+                this.filterStatus = '';
             }
         }">
 
@@ -56,7 +61,7 @@
 
         {{-- Filter Card --}}
         <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end"> {{-- Changed to grid-cols-5 for the extra status filter --}}
                 <div class="space-y-2">
                     <label class="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-2">Student</label>
                     <select x-model="filterStudent" class="w-full px-5 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-500/10 outline-none cursor-pointer">
@@ -78,12 +83,24 @@
                 </div>
 
                 <div class="space-y-2">
-                    <label class="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-2">Date</label>
-                    <input type="date" x-model="filterDate" class="w-full px-5 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-500/10 outline-none">
+                    <label class="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-2">Status</label>
+                    <select x-model="filterStatus" class="w-full px-5 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-500/10 outline-none cursor-pointer">
+                        <option value="">All Statuses</option>
+                        <option value="Present">Present</option>
+                        <option value="Absent">Absent</option>
+                        <option value="Late">Late</option>
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-2">Filter by Month</label>
+                    <input type="month"
+                        x-model="filterDate"
+                        class="w-full px-5 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-500/10 outline-none">
                 </div>
 
                 <button @click="resetFilters()" class="w-full bg-slate-800 text-white py-4 rounded-2xl font-black text-sm hover:bg-slate-900 transition shadow-lg cursor-pointer">
-                    Reset Filters
+                    Reset
                 </button>
             </div>
         </div>
