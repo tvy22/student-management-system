@@ -1,10 +1,8 @@
 <div
-    x-data="{ open: false, selectedRecord: {} }"
-        x-show="open"
-        @open-attendance-modal.window="open = true; selectedRecord = $event.detail"
-        @keydown.escape.window="open = false"
-        class="fixed inset-0 z-50 overflow-y-auto"
-        x-cloak
+    x-show="showAttendanceInfoModal"
+    @keydown.escape.window="showAttendanceInfoModal = false"
+    class="fixed inset-0 z-50 overflow-y-auto"
+    x-cloak
 >
     <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
 
@@ -16,7 +14,7 @@
                     <h2 class="text-2xl font-black text-slate-800 tracking-tight">Attendance Details</h2>
                     <p class="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">Detailed Record Overview</p>
                 </div>
-                <button @click="open = false" class="p-3 bg-slate-100 hover:bg-red-50 hover:text-red-500 text-slate-400 rounded-2xl transition-all cursor-pointer">
+                <button @click="showAttendanceInfoModal = false" class="p-3 bg-slate-100 hover:bg-red-50 hover:text-red-500 text-slate-400 rounded-2xl transition-all cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
@@ -98,7 +96,7 @@
             </div>
 
             <div class="p-8 bg-slate-50 flex justify-end">
-                <button @click="open = false" class="px-8 py-3 bg-slate-800 text-white rounded-xl font-black text-sm cursor-pointer">Close</button>
+                <button @click="showAttendanceInfoModal = false" class="px-8 py-3 bg-slate-800 text-white rounded-xl font-black text-sm cursor-pointer">Close</button>
             </div>
         </div>
     </div>
