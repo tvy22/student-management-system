@@ -39,7 +39,7 @@
                             </div>
                             <div>
                                 <p class="text-[10px] font-black text-indigo-300 uppercase">Name</p>
-                                <p class="font-bold text-slate-700 text-lg truncate" x-text="selectedRecord.student_name"></p>
+                                <p class="font-bold text-slate-700 text-md truncate" x-text="selectedRecord.student_name"></p>
                             </div>
 
                             <div>
@@ -69,7 +69,7 @@
                         <div class="grid grid-cols-2 gap-y-5 gap-x-4">
                             <div>
                                 <p class="text-[10px] font-black text-sky-300 uppercase">Course</p>
-                                <p class="font-bold text-slate-800 text-lg leading-tight" x-text="selectedRecord.class_name"></p>
+                                <p class="font-bold text-slate-800 text-md leading-tight" x-text="selectedRecord.course"></p>
                             </div>
                             <div>
                                 <p class="text-[10px] font-black text-sky-300 uppercase">Class ID</p>
