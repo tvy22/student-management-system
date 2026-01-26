@@ -211,57 +211,76 @@
                                 <th class="px-6 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100">
-                            {{-- Loading State --}}
-                            <template x-if="loading">
-                                <tr>
-                                    <td colspan="7" class="py-20 text-center">
-                                        <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full"></div>
-                                        <p class="text-slate-400 font-bold mt-2">Loading classes...</p>
-                                    </td>
-                                </tr>
-                            </template>
+<tbody class="divide-y divide-slate-100">
+    {{-- 1. Loading State --}}
+    <template x-if="loading">
+        <tr>
+            <td colspan="7" class="py-20 text-center">
+                <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full"></div>
+                <p class="text-slate-400 font-bold mt-2">Loading classes...</p>
+            </td>
+        </tr>
+    </template>
 
-                            {{-- Data State --}}
-                            <template x-if="!loading">
-                                <template x-for="cls in filteredClasses" :key="cls.id">
-                                    <tr class="hover:bg-slate-50/80 transition-colors group">
-                                        <td class="px-6 py-5">
-                                            <span class="text-xs font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-md" x-text="cls.id"></span>
-                                        </td>
-                                        <td class="px-6 py-5">
-                                            <div class="font-bold text-slate-800 text-sm" x-text="cls.name"></div>
-                                        </td>
-                                        <td class="px-6 py-5 text-sm font-bold text-slate-600" x-text="cls.room"></td>
-                                        <td class="px-6 py-5">
-                                            <span class="px-3 py-1 bg-orange-50 text-orange-600 rounded-full text-[10px] font-black uppercase" x-text="cls.term"></span>
-                                        </td>
-                                        <td class="px-6 py-5 text-sm font-bold text-slate-600" x-text="cls.time"></td>
-                                        <td class="px-6 py-5 text-center">
-                                            <span class="text-sm font-black text-slate-800" x-text="cls.students"></span>
-                                        </td>
-                                        <td class="px-6 py-5 text-right">
-                                            <div class="flex justify-end gap-1">
-                                                <a :href="'/student/' + cls.id" class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition cursor-pointer">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                    </svg>
-                                                </a>
+    {{-- 2. Data State (When classes exist) --}}
+    <template x-if="!loading && filteredClasses.length > 0">
+        <template x-for="cls in filteredClasses" :key="cls.id">
+            <tr class="hover:bg-slate-50/80 transition-colors group">
+                <td class="px-6 py-5">
+                    <span class="text-xs font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-md" x-text="cls.id"></span>
+                </td>
+                <td class="px-6 py-5">
+                    <div class="font-bold text-slate-800 text-sm" x-text="cls.name"></div>
+                </td>
+                <td class="px-6 py-5 text-sm font-bold text-slate-600" x-text="cls.room"></td>
+                <td class="px-6 py-5">
+                    <span class="px-3 py-1 bg-orange-50 text-orange-600 rounded-full text-[10px] font-black uppercase" x-text="cls.term"></span>
+                </td>
+                <td class="px-6 py-5 text-sm font-bold text-slate-600" x-text="cls.time"></td>
+                <td class="px-6 py-5 text-center">
+                    <span class="text-sm font-black text-slate-800" x-text="cls.students"></span>
+                </td>
+                <td class="px-6 py-5 text-right">
+                    <div class="flex justify-end gap-1">
+                        <a :href="'/student/' + cls.id" class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </a>
+                        <button @click="$dispatch('open-edit-class', cls)" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                        </button>
+                        <button @click="$dispatch('open-delete-class', cls)" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </template>
+    </template>
 
-                                                <button @click="$dispatch('open-edit-class', cls)" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition cursor-pointer">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                                                </button>
+    {{-- 3. Empty State (When no classes are found) --}}
+    <template x-if="!loading && filteredClasses.length === 0">
+        <tr>
+            <td colspan="7" class="py-24 text-center">
+                <div class="flex flex-col items-center justify-center">
+                    <div class="bg-slate-50 p-6 rounded-[2rem] mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18c-2.305 0-4.408.867-6 2.292m0-14.25v14.25" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-black text-slate-800">No classes found</h3>
+                    <p class="text-slate-400 font-bold text-sm max-w-[250px] mx-auto mt-1" x-text="search ? 'No classes match your search \'' + search + '\'' : 'You haven\'t added any classes to your schedule yet.'"></p>
 
-                                                <button @click="$dispatch('open-delete-class', cls)" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition cursor-pointer">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </template>
-                            </template>
-                        </tbody>
+                    <button @click="showAddClassModal = true" class="mt-6 flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-200 text-slate-600 rounded-xl font-black text-xs hover:border-blue-500 hover:text-blue-600 transition cursor-pointer">
+                        <span>Create your first class</span>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    </template>
+</tbody>
                     </table>
                 </div>
         </div>

@@ -126,26 +126,72 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
+                        {{-- 1. Loading State --}}
                         <template x-if="loading">
-                            <tr><td colspan="5" class="py-20 text-center"><div class="animate-spin inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full"></div></td></tr>
+                            <tr>
+                                <td colspan="5" class="py-20 text-center">
+                                    <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full"></div>
+                                    <p class="text-slate-400 font-bold mt-2">Loading directory...</p>
+                                </td>
+                            </tr>
                         </template>
 
-                        <template x-for="student in filteredStudents" :key="student.id">
-                            <tr class="hover:bg-blue-50/50 transition-colors group">
-                                <td class="px-8 py-5">
-                                    <span class="font-mono font-black text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg text-xs" x-text="student.id"></span>
-                                </td>
-                                <td class="px-8 py-5"><span class="font-bold text-slate-600" x-text="student.name"></span></td>
-                                <td class="px-8 py-5"><span class="font-bold text-slate-600" x-text="student.email"></span></td>
-                                <td class="px-8 py-5"><span class="font-bold text-slate-600" x-text="student.phone"></span></td>
-                                <td class="px-8 py-5 text-center">
-                                    <div class="flex items-center justify-center gap-2">
-                                        <button @click="$dispatch('open-edit-student', student.id)" class="p-2.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all cursor-pointer">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                                        </button>
-                                        <button @click="$dispatch('open-delete-student', student.id)" class="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                        </button>
+                        {{-- 2. Data State --}}
+                        <template x-if="!loading && filteredStudents.length > 0">
+                            <template x-for="student in filteredStudents" :key="student.id">
+                                <tr class="hover:bg-blue-50/50 transition-colors group">
+                                    <td class="px-8 py-5">
+                                        <span class="font-mono font-black text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg text-xs" x-text="student.id"></span>
+                                    </td>
+                                    <td class="px-8 py-5"><span class="font-bold text-slate-600" x-text="student.name"></span></td>
+                                    <td class="px-8 py-5"><span class="font-bold text-slate-600" x-text="student.email"></span></td>
+                                    <td class="px-8 py-5"><span class="font-bold text-slate-600" x-text="student.phone"></span></td>
+                                    <td class="px-8 py-5 text-center">
+                                        <div class="flex items-center justify-center gap-2">
+                                            <button @click="$dispatch('open-edit-student', student.id)" class="p-2.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all cursor-pointer">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                            </button>
+                                            <button @click="$dispatch('open-delete-student', student.id)" class="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </template>
+
+                        {{-- 3. Empty State (No Data or No Search Results) --}}
+                        <template x-if="!loading && filteredStudents.length === 0">
+                            <tr>
+                                <td colspan="5" class="py-24 text-center">
+                                    <div class="flex flex-col items-center justify-center max-w-sm mx-auto">
+                                        {{-- Icon Container --}}
+                                        <div class="bg-slate-50 p-6 rounded-[2.5rem] mb-6 text-slate-300">
+                                            <template x-if="search">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                                </svg>
+                                            </template>
+                                            <template x-if="!search">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                                                </svg>
+                                            </template>
+                                        </div>
+
+                                        {{-- Text Content --}}
+                                        <h3 class="text-xl font-black text-slate-800" x-text="search ? 'No matches found' : 'No students registered'"></h3>
+                                        <p class="text-slate-400 font-bold text-sm mt-2 leading-relaxed"
+                                        x-text="search ? 'We couldn\'t find any student matching \'' + search + '\'. Try a different ID or name.' : 'Your directory is currently empty. Start by adding a new student.'">
+                                        </p>
+
+                                        {{-- Action Button (Only show if not searching) --}}
+                                        <div class="mt-8" x-show="!search">
+                                            <button @click="showRegisterModal = true" class="px-8 py-3 bg-blue-600 text-white rounded-2xl font-black text-sm hover:bg-blue-700 transition shadow-lg shadow-blue-200 flex items-center gap-2 cursor-pointer">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                                                Add Your First Student
+                                            </button>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
