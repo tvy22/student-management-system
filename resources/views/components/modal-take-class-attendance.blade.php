@@ -33,7 +33,7 @@
 
                         <div class="flex items-center gap-3">
                             <input type="date" x-model="attendanceDate" class="px-5 py-3 bg-white border-2 border-gray-100 rounded-2xl font-bold text-slate-700 outline-none focus:border-blue-500 transition shadow-sm">
-                            <button @click="$dispatch('notify', { message: 'Attendance Saved!', type: 'success' }); showTakeAttendanceModal = false;" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-blue-200 transition active:scale-95 flex items-center gap-2 cursor-pointer">
+                            <button @click="submitAttendance()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-blue-200 transition active:scale-95 flex items-center gap-2 cursor-pointer">
                                 Save Attendance
                             </button>
                         </div>
@@ -65,7 +65,8 @@
                             </thead>
                             <tbody class="divide-y divide-gray-50">
                                 <template x-for="student in students" :key="student.id">
-                                    <tr class="hover:bg-slate-50/50 transition"
+                                    <tr class="attendance-row hover:bg-slate-50/50 transition"
+                                        :data-student-id="student.id"
                                         x-data="{ status: 'present', note: '' }"
                                         @mark-all-present.window="status = 'present'">
 
