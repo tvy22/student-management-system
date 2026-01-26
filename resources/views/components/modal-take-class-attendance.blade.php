@@ -86,7 +86,7 @@
                                             <div class="flex items-center justify-center gap-2">
                                                 <button @click="status = 'present'" :class="status === 'present' ? 'bg-green-500 text-white shadow-lg shadow-green-200' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'" class="px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Present</button>
                                                 <button @click="status = 'absent'" :class="status === 'absent' ? 'bg-red-500 text-white shadow-lg shadow-red-200' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'" class="px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Absent</button>
-                                                <button @click="status = 'excused'" :class="status === 'excused' ? 'bg-amber-500 text-white shadow-lg shadow-amber-200' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'" class="px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Permission</button>
+                                                <button @click="status = 'permission'" :class="status === 'permission' ? 'bg-amber-500 text-white shadow-lg shadow-amber-200' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'" class="px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Permission</button>
                                             </div>
                                         </td>
 
@@ -94,8 +94,8 @@
                                             <input type="text"
                                                 x-model="note"
                                                 placeholder="Add reason..."
-                                                :disabled="status !== 'excused'"
-                                                :class="status === 'excused' ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-gray-50 border-gray-100 text-gray-400 cursor-not-allowed'"
+                                                :disabled="status !== 'permission'"
+                                                :class="status === 'permission' ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-gray-50 border-gray-100 text-gray-400 cursor-not-allowed'"
                                                 class="w-full px-4 py-3 border-2 rounded-xl text-sm font-bold transition-all outline-none focus:border-blue-500">
                                         </td>
                                     </tr>
