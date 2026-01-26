@@ -12,10 +12,14 @@
     showRegisterModal: false,
     showEditClassModal: false,
     showEndClassModal: false,
+    showTakeAttendanceModal: false,
     selectedClassId: null,
     selectedClassName: '',
     classes: [],
     totalStudents: 0,
+    students: [],
+    classInfo: {},
+    attendanceDate: '{{ date('Y-m-d') }}',
 
     editFormData: {
         course: '',
@@ -143,7 +147,31 @@
             c.course.toLowerCase().includes(this.search.toLowerCase()) ||
             c.room.toLowerCase().includes(this.search.toLowerCase())
         );
-    }
+    },
+
+    async fetchStudents(classId) {
+        {{-- this.loading = true; // Use your existing loading state --}}
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/api/class/${classId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('school_token')}`,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                this.classInfo = result.class_info;
+                this.students = result.data; // This fills the table in your modal
+                this.showTakeAttendanceModal = true;
+            }
+        } catch (error) {
+            console.error('Error fetching students:', error);
+        } finally {
+            this.loading = false;
+        }
+    },
 }">
 
     {{-- Stats Cards --}}
@@ -230,9 +258,9 @@
                             <span>Students</span>
                         </a>
 
-                        <a href="/take" class="flex-1 flex items-center justify-center gap-1.5 px-2 py-3 bg-green-500 text-white rounded-xl font-bold text-[10px] hover:bg-green-700 transition active:scale-95 shadow-sm shadow-green-100 uppercase tracking-tighter whitespace-nowrap">
+                        <button @click="fetchStudents(cls.id)" class="flex-1 flex items-center justify-center gap-1.5 px-2 py-3 bg-green-500 text-white rounded-xl font-bold text-[10px] hover:bg-green-700 transition active:scale-95 shadow-sm shadow-green-100 uppercase tracking-tighter whitespace-nowrap">
                             <span>Attendance</span>
-                        </a>
+                        </button>
 
                         <div class="relative shrink-0" x-data="{ menuOpen: false }">
                             <button @click="menuOpen = !menuOpen" @click.away="menuOpen = false" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition cursor-pointer">
@@ -243,14 +271,6 @@
 
                             <div x-show="menuOpen" x-transition x-cloak class="absolute right-0 bottom-full mb-2 w-48 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
                                 <div class="p-2 text-left">
-                                    <button @click="
-                                        selectedClassId = cls.id;
-                                        console.log('Class ID: ', selectedClassId);
-                                        showRegisterModal = true;
-                                        menuOpen = false"
-                                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition cursor-pointer">
-                                        Add Student
-                                    </button>
 
                                     <button @click="
                                         selectedClassId = cls.id;
@@ -289,6 +309,7 @@
     <x-modal-register-student />
     <x-modal-edit-class />
     <x-modal-end-class />
+    <x-modal-take-class-attendance />
 
 </div>
 @endsection

@@ -85,13 +85,12 @@
                         {{-- 4. Added x-model="email" --}}
                         <input x-model="email" type="email" name="email" required
                             class="w-full px-5 py-3 rounded-2xl border-2 border-gray-100 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 outline-none shadow-sm placeholder:text-gray-400"
-                            placeholder="name@skilltech.com">
+                            placeholder="name@gmail.com">
                     </div>
 
                     <div>
                         <div class="flex justify-between mb-1 ml-1">
                             <label for="password" class="block text-sm font-bold text-gray-700">Password</label>
-                            <a href="#" class="text-sm font-semibold text-blue-600 hover:text-blue-700">Forgot?</a>
                         </div>
                         {{-- 5. Added x-model="password" --}}
                         <input x-model="password" type="password" name="password" required
