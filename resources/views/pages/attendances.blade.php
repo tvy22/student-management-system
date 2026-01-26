@@ -68,12 +68,56 @@
             );
         },
 
-        updateAttendance() {
-            const index = this.records.findIndex(r => r.id === this.editAttendanceData.id);
-            if (index !== -1) {
-                this.records[index] = { ...this.editAttendanceData };
+        async updateAttendance() {
+            // Basic validation to ensure we have an ID
+            if (!this.editAttendanceData.id) return;
+
+            this.isLoading = true; // Use global loading or a local one
+
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/attendence/${this.editAttendanceData.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('school_token')}`,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: this.editAttendanceData.status.toLowerCase(), // API expects lowercase
+                        remark: this.editAttendanceData.remark
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Find the record in our local array and update it
+                    const index = this.records.findIndex(r => r.id === this.editAttendanceData.id);
+                    if (index !== -1) {
+                        // Merge updated data from server back into our local state
+                        this.records[index] = {
+                            ...this.records[index],
+                            status: result.data.status,
+                            remark: result.data.remark
+                        };
+                    }
+
+                    this.$dispatch('notify', { message: 'Attendance updated successfully!', type: 'success' });
+                    this.showEditAttendanceModal = false;
+                } else {
+                    // Error handling like we did before
+                    let errorMsg = result.message || 'Failed to update';
+                    if (result.errors) {
+                        errorMsg = result.errors[Object.keys(result.errors)[0]][0];
+                    }
+                    this.$dispatch('notify', { message: errorMsg, type: 'error' });
+                }
+            } catch (error) {
+                console.error('Update error:', error);
+                this.$dispatch('notify', { message: 'Network error occurred', type: 'error' });
+            } finally {
+                this.isLoading = false;
             }
-            this.showEditAttendanceModal = false;
         }
     }">
 
