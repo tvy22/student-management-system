@@ -311,14 +311,14 @@ async submitAttendance() {
                                                 x-show="student.stats.total_records > 0"></div>
                                         </div>
 
-                                        <div class="flex items-center gap-3 text-[9px] font-bold uppercase tracking-tight">
+                                        <div class="flex items-center gap-3 text-[11px] font-bold uppercase tracking-tight">
                                             <div class="flex items-center gap-1">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                                 <span class="text-slate-500">P: <span x-text="student.stats.total_present"></span></span>
                                             </div>
                                             <div class="flex items-center gap-1">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                                                <span class="text-slate-500">LEA: <span x-text="student.stats.total_permission"></span></span>
+                                                <span class="text-slate-500">L: <span x-text="student.stats.total_permission"></span></span>
                                             </div>
                                             <div class="flex items-center gap-1">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
@@ -333,6 +333,7 @@ async submitAttendance() {
                             <td class="px-8 py-5 text-center">
                                 <div class="flex items-center justify-center gap-2">
                                     <button @click="$dispatch('open-attendance-history', {
+                                            studentId: student.id,
                                             studentName: student.name,
                                             courseName: classInfo.course_name,
                                             stats: student.stats
