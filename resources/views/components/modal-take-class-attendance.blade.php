@@ -54,54 +54,73 @@
                 {{-- 2. Scrollable Table Area --}}
                 <div class="p-8 md:p-12 pt-0 overflow-y-auto grow">
                     <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden mb-4">
-                        <table class="w-full text-left border-collapse">
-                            {{-- 3. Sticky Table Header --}}
-                            <thead class="sticky top-0 z-10">
-                                <tr class="bg-slate-800 border-b border-slate-700">
-                                    <th class="p-6 text-[10px] font-black text-slate-300 uppercase tracking-widest">Student Information</th>
-                                    <th class="p-6 text-[10px] font-black text-slate-300 uppercase tracking-widest text-center">Status</th>
-                                    <th class="p-6 text-[10px] font-black text-slate-300 uppercase tracking-widest">Remark</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-50">
-                                <template x-for="student in students" :key="student.id">
-                                    <tr class="attendance-row hover:bg-slate-50/50 transition"
-                                        :data-student-id="student.id"
-                                        x-data="{ status: 'present', note: '' }"
-                                        @mark-all-present.window="status = 'present'">
 
-                                        <td class="p-6">
-                                            <div class="flex items-center gap-4">
-                                                <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center font-black text-sm"
-                                                    x-text="student.name.split(' ').map(n => n[0]).join('').toUpperCase()">
-                                                </div>
-                                                <div>
-                                                    <p class="font-black text-slate-800 text-lg transition" x-text="student.name"></p>
-                                                    <p class="text-xs font-bold text-slate-400 uppercase" x-text="'ID: ' + student.id"></p>
-                                                </div>
-                                            </div>
-                                        </td>
-
-                                        <td class="p-6 text-center">
-                                            <div class="flex items-center justify-center gap-2">
-                                                <button @click="status = 'present'" :class="status === 'present' ? 'bg-green-500 text-white shadow-lg shadow-green-200' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'" class="px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Present</button>
-                                                <button @click="status = 'absent'" :class="status === 'absent' ? 'bg-red-500 text-white shadow-lg shadow-red-200' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'" class="px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Absent</button>
-                                                <button @click="status = 'permission'" :class="status === 'permission' ? 'bg-amber-500 text-white shadow-lg shadow-amber-200' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'" class="px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Permission</button>
-                                            </div>
-                                        </td>
-
-                                        <td class="p-6">
-                                            <input type="text"
-                                                x-model="note"
-                                                placeholder="Add reason..."
-                                                :disabled="status !== 'permission'"
-                                                :class="status === 'permission' ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-gray-50 border-gray-100 text-gray-400 cursor-not-allowed'"
-                                                class="w-full px-4 py-3 border-2 rounded-xl text-sm font-bold transition-all outline-none focus:border-blue-500">
-                                        </td>
+                        {{-- Show Table if Students Exist --}}
+                        <template x-if="students.length > 0">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="sticky top-0 z-10">
+                                    <tr class="bg-slate-800 border-b border-slate-700">
+                                        <th class="p-6 text-[10px] font-black text-slate-300 uppercase tracking-widest">Student Information</th>
+                                        <th class="p-6 text-[10px] font-black text-slate-300 uppercase tracking-widest text-center">Status</th>
+                                        <th class="p-6 text-[10px] font-black text-slate-300 uppercase tracking-widest">Remark</th>
                                     </tr>
-                                </template>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody class="divide-y divide-gray-50">
+                                    <template x-for="student in students" :key="student.id">
+                                        <tr class="attendance-row hover:bg-slate-50/50 transition"
+                                            :data-student-id="student.id"
+                                            x-data="{ status: 'present', note: '' }"
+                                            @mark-all-present.window="status = 'present'">
+
+                                            <td class="p-6">
+                                                <div class="flex items-center gap-4">
+                                                    <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center font-black text-sm"
+                                                        x-text="student.name.split(' ').map(n => n[0]).join('').toUpperCase()">
+                                                    </div>
+                                                    <div>
+                                                        <p class="font-black text-slate-800 text-lg transition" x-text="student.name"></p>
+                                                        <p class="text-xs font-bold text-slate-400 uppercase" x-text="'ID: ' + student.id"></p>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <td class="p-6 text-center">
+                                                <div class="flex items-center justify-center gap-2">
+                                                    <button @click="status = 'present'" :class="status === 'present' ? 'bg-green-500 text-white shadow-lg shadow-green-200' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'" class="px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Present</button>
+                                                    <button @click="status = 'absent'" :class="status === 'absent' ? 'bg-red-500 text-white shadow-lg shadow-red-200' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'" class="px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Absent</button>
+                                                    <button @click="status = 'permission'" :class="status === 'permission' ? 'bg-amber-500 text-white shadow-lg shadow-amber-200' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'" class="px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Permission</button>
+                                                </div>
+                                            </td>
+
+                                            <td class="p-6">
+                                                <input type="text"
+                                                    x-model="note"
+                                                    placeholder="Add reason..."
+                                                    :disabled="status !== 'permission'"
+                                                    :class="status === 'permission' ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-gray-50 border-gray-100 text-gray-400 cursor-not-allowed'"
+                                                    class="w-full px-4 py-3 border-2 rounded-xl text-sm font-bold transition-all outline-none focus:border-blue-500">
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </template>
+
+                        {{-- Empty State: No Students in Class --}}
+                        <template x-if="students.length === 0">
+                            <div class="py-24 flex flex-col items-center justify-center text-center px-6">
+                                <div class="w-24 h-24 bg-slate-50 rounded-4xl flex items-center justify-center text-slate-300 mb-6 border-2 border-dashed border-slate-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.998 5.998 0 0 0-12 0m12 0c0-1.223-.367-2.361-.996-3.304m-11.008 3.304a5.997 5.997 0 0 1 .996-3.304m11.008 3.304A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.997 5.997 0 0 0-1.004-3.304M6.004 18.719A5.997 5.997 0 0 1 7 15.415m0 0a5.998 5.998 0 0 1 10 0m-10 0a5.998 5.998 0 0 0 10 0m-10 0V15a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v.415m-10 0h10" />
+                                    </svg>
+                                </div>
+                                <h3 class="text-2xl font-black text-slate-800">No Students Enrolled</h3>
+                                <p class="text-slate-500 font-bold mt-2 max-w-sm mx-auto">
+                                    This class doesn't have any students yet. You need to enroll students before you can take attendance.
+                                </p>
+                            </div>
+                        </template>
+
                     </div>
                 </div>
             </div>
