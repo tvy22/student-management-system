@@ -74,8 +74,30 @@
 
             if (response.ok) {
                 const result = await response.json();
-                this.classInfo = result.class_info; // Data from your controller
-                this.students = result.data;       // The students array
+                this.classInfo = result.class_info;
+
+                // Initialize students with null stats so the UI has a loading state
+                this.students = result.data.map(s => ({ ...s, stats: null }));
+
+                // Fetch stats for each student individually
+                this.students.forEach(async (student, index) => {
+                    try {
+                        const statsRes = await fetch(`http://127.0.0.1:8000/api/attendence/Stats?student_id=${student.id}&class_id=${this.classId}`, {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('school_token')}`,
+                                'Accept': 'application/json'
+                            }
+                        });
+                        if (statsRes.ok) {
+                            const statsData = await statsRes.json();
+                            // Update the specific student object with real data
+                            this.students[index].stats = statsData.attendance;
+                        }
+                    } catch (e) {
+                        console.error(`Error fetching stats for student ${student.id}:`, e);
+                    }
+                });
             }
         } catch (error) {
             console.error('Error fetching students:', error);
@@ -264,21 +286,48 @@ async submitAttendance() {
                             </td> --}}
 
                             <td class="px-8 py-5 bg-slate-50/50 border-x border-slate-100">
-                                <div class="flex flex-col gap-2 w-40">
-                                    <div class="flex justify-between items-end">
-                                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Attendance</span>
-                                        <span class="text-xs font-black text-blue-600">84.4%</span>
+                                <template x-if="!student.stats">
+                                    <div class="flex items-center justify-center py-4">
+                                        <div class="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                                     </div>
+                                </template>
 
-                                    <div class="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden flex">
-                                        <div class="bg-emerald-500 h-full" style="width: 70%"></div> <div class="bg-amber-400 h-full" style="width: 15%"></div>   <div class="bg-rose-500 h-full" style="width: 15%"></div>    </div>
+                                <template x-if="student.stats">
+                                    <div class="flex flex-col gap-2 w-48">
+                                        <div class="flex justify-between items-end">
+                                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Attendance Rate</span>
+                                            <span class="text-xs font-black text-blue-600" x-text="student.stats.attendance_rate"></span>
+                                        </div>
 
-                                    <div class="flex gap-3 text-[9px] font-bold uppercase tracking-tighter">
-                                        <span class="text-emerald-600">P: 38</span>
-                                        <span class="text-rose-600">A: 4</span>
-                                        <span class="text-amber-600">L: 3</span>
+                                        <div class="h-2 w-full bg-slate-200 rounded-full overflow-hidden flex shadow-inner">
+                                            <div class="bg-emerald-500 h-full transition-all duration-700"
+                                                :style="`width: ${(student.stats.total_present / student.stats.total_records) * 100}%`"
+                                                x-show="student.stats.total_records > 0"></div>
+                                            <div class="bg-amber-400 h-full transition-all duration-700"
+                                                :style="`width: ${(student.stats.total_permission / student.stats.total_records) * 100}%`"
+                                                x-show="student.stats.total_records > 0"></div>
+                                            <div class="bg-rose-500 h-full transition-all duration-700"
+                                                :style="`width: ${(student.stats.total_absent / student.stats.total_records) * 100}%`"
+                                                x-show="student.stats.total_records > 0"></div>
+                                        </div>
+
+                                        <div class="flex items-center gap-3 text-[9px] font-bold uppercase tracking-tight">
+                                            <div class="flex items-center gap-1">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                                <span class="text-slate-500">P: <span x-text="student.stats.total_present"></span></span>
+                                            </div>
+                                            <div class="flex items-center gap-1">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                                <span class="text-slate-500">LEA: <span x-text="student.stats.total_permission"></span></span>
+                                            </div>
+                                            <div class="flex items-center gap-1">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                                <span class="text-slate-500">A: <span x-text="student.stats.total_absent"></span></span>
+                                            </div>
+                                            <div class="ml-auto text-slate-400 font-black">Total: <span x-text="student.stats.total_records"></span></div>
+                                        </div>
                                     </div>
-                                </div>
+                                </template>
                             </td>
 
                             <td class="px-8 py-5 text-center">
