@@ -230,7 +230,6 @@
                                             <span class="text-xs font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-md" x-text="cls.id"></span>
                                         </td>
                                         <td class="px-6 py-5">
-                                            {{-- Course name now rendered normally --}}
                                             <div class="font-bold text-slate-800 text-sm" x-text="cls.name"></div>
                                         </td>
                                         <td class="px-6 py-5 text-sm font-bold text-slate-600" x-text="cls.room"></td>
