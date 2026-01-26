@@ -150,6 +150,7 @@
     },
 
     async fetchStudents(classId) {
+        this.selectedClassId = classId;   
         {{-- this.loading = true; // Use your existing loading state --}}
         try {
             const response = await fetch(`http://127.0.0.1:8000/api/class/${classId}`, {
@@ -172,6 +173,67 @@
             this.loading = false;
         }
     },
+
+    async submitAttendance() {
+        this.loading = true;
+
+        const rows = document.querySelectorAll('.attendance-row');
+        const attendanceData = [];
+
+        rows.forEach(row => {
+            const studentId = row.getAttribute('data-student-id');
+
+            // Use the official Alpine utility to get data from the row
+            const rowData = Alpine.$data(row);
+
+            {{-- const formattedDate = new Date(this.attendanceDate).toISOString().split('T')[0]; --}}
+            const formattedDate = this.attendanceDate;
+
+            if (rowData) {
+                attendanceData.push({
+                    student_id: studentId,
+                    class_id: this.selectedClassId,
+                    date: formattedDate,
+                    status: rowData.status,
+                    remark: rowData.note
+                });
+            }
+        });
+
+        if (attendanceData.length === 0) {
+            this.loading = false;
+            return;
+        }
+
+        try {
+            const requests = attendanceData.map(data =>
+                fetch(`http://127.0.0.1:8000/api/attendence`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('school_token')}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+            );
+
+            const responses = await Promise.all(requests);
+
+            if (responses.every(r => r.ok)) {
+                this.$dispatch('notify', { message: 'Attendance Saved!', type: 'success' });
+                this.showTakeAttendanceModal = false;
+                // Optional: refresh the list if needed
+            } else {
+                this.$dispatch('notify', { message: 'Failed to save attendance!', type: 'error' });
+                this.showTakeAttendanceModal = false;
+            }
+        } catch (error) {
+            console.error('Error saving attendance:', error);
+        } finally {
+            this.loading = false;
+        }
+    }
 }">
 
     {{-- Stats Cards --}}
