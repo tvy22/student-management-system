@@ -298,84 +298,117 @@
     </div>
 
     {{-- Loading Spinner --}}
-    <div x-show="loading" class="col-span-full py-20 flex justify-center" x-cloak>
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    <div x-show="loading" class="col-span-full py-20 flex flex-col items-center justify-center" x-cloak>
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+        <p class="mt-4 text-slate-400 font-bold">Loading your classes...</p>
     </div>
 
-    {{-- Class Cards Grid --}}
-    <div x-show="!loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <template x-for="cls in filteredClasses" :key="cls.id">
-            <div class="bg-white rounded-3xl shadow-sm border border-gray-300 overflow-hidden hover:shadow-xl transition-all duration-300 group">
-                <div class="p-5 bg-blue-200 border-b border-gray-100 group-hover:bg-blue-300 transition-colors">
-                    <h3 class="text-xl font-black text-slate-800 leading-tight" x-text="cls.course"></h3>
-                </div>
-
-                <div class="p-6 ">
-                    <div class="grid grid-cols-2 gap-y-4 gap-x-2">
-                        <div>
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Term</p>
-                            <p class="text-sm font-bold text-slate-700" x-text="cls.term"></p>
+    {{-- Class Cards Grid + Empty States --}}
+    <div x-show="!loading" x-cloak>
+        {{-- Success: Show Classes --}}
+        <template x-if="filteredClasses.length > 0">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <template x-for="cls in filteredClasses" :key="cls.id">
+                    <div class="bg-white rounded-3xl shadow-sm border border-gray-300 overflow-hidden hover:shadow-xl transition-all duration-300 group">
+                        <div class="p-5 bg-blue-200 border-b border-gray-100 group-hover:bg-blue-300 transition-colors">
+                            <h3 class="text-xl font-black text-slate-800 leading-tight" x-text="cls.course"></h3>
                         </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Room</p>
-                            <p class="text-sm font-bold text-slate-700" x-text="cls.room"></p>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Teacher</p>
-                            <p class="text-sm font-bold text-slate-700" x-text="teacherName"></p>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Time</p>
-                            <p class="text-sm font-bold text-slate-700" x-text="cls.class_time"></p>
-                        </div>
-                    </div>
 
-                    <div class="mt-6 pt-4 border-t border-dashed border-gray-200 flex items-center justify-between gap-2">
-                        <a :href="'/student/' + cls.id" class="flex-1 flex items-center justify-center gap-1.5 px-2 py-3 bg-blue-50 text-blue-700 rounded-xl font-bold text-[10px] hover:bg-blue-100 transition active:scale-95 group uppercase tracking-tighter whitespace-nowrap">
-                            <span>Students</span>
-                        </a>
+                        <div class="p-6 ">
+                            <div class="grid grid-cols-2 gap-y-4 gap-x-2">
+                                <div>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Term</p>
+                                    <p class="text-sm font-bold text-slate-700" x-text="cls.term"></p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Room</p>
+                                    <p class="text-sm font-bold text-slate-700" x-text="cls.room"></p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Teacher</p>
+                                    <p class="text-sm font-bold text-slate-700" x-text="teacherName"></p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Time</p>
+                                    <p class="text-sm font-bold text-slate-700" x-text="cls.class_time"></p>
+                                </div>
+                            </div>
 
-                        <button @click="fetchStudents(cls.id)" class="flex-1 flex items-center justify-center gap-1.5 px-2 py-3 bg-green-500 text-white rounded-xl font-bold text-[10px] hover:bg-green-700 transition active:scale-95 shadow-sm shadow-green-100 uppercase tracking-tighter whitespace-nowrap">
-                            <span>Attendance</span>
-                        </button>
+                            <div class="mt-6 pt-4 border-t border-dashed border-gray-200 flex items-center justify-between gap-2">
+                                <a :href="'/student/' + cls.id" class="flex-1 flex items-center justify-center gap-1.5 px-2 py-3 bg-blue-50 text-blue-700 rounded-xl font-bold text-[10px] hover:bg-blue-100 transition active:scale-95 group uppercase tracking-tighter whitespace-nowrap">
+                                    <span>Students</span>
+                                </a>
 
-                        <div class="relative shrink-0" x-data="{ menuOpen: false }">
-                            <button @click="menuOpen = !menuOpen" @click.away="menuOpen = false" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition cursor-pointer">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
-                                </svg>
-                            </button>
+                                <button @click="fetchStudents(cls.id)" class="flex-1 flex items-center justify-center gap-1.5 px-2 py-3 bg-green-500 text-white rounded-xl font-bold text-[10px] hover:bg-green-700 transition active:scale-95 shadow-sm shadow-green-100 uppercase tracking-tighter whitespace-nowrap cursor-pointer">
+                                    <span>Attendance</span>
+                                </button>
 
-                            <div x-show="menuOpen" x-transition x-cloak class="absolute right-0 bottom-full mb-2 w-48 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
-                                <div class="p-2 text-left">
-
-                                    <button @click="
-                                        selectedClassId = cls.id;
-                                        console.log('Class ID: ', selectedClassId);
-                                        editFormData = {
-                                            course: cls.course,
-                                            room: cls.room,
-                                            term: cls.term,
-                                            class_time: cls.class_time,
-                                        };
-                                        showEditClassModal = true;
-                                        menuOpen = false;
-                                    " class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition cursor-pointer">
-                                        Edit Class
+                                <div class="relative shrink-0" x-data="{ menuOpen: false }">
+                                    <button @click="menuOpen = !menuOpen" @click.away="menuOpen = false" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition cursor-pointer">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
+                                        </svg>
                                     </button>
 
-                                    <button @click="
-                                        selectedClassId = cls.id;
-                                        selectedClassName = cls.course;
-                                        showEndClassModal = true;
-                                        menuOpen = false;
-                                    " class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl transition cursor-pointer">
-                                        Delete Class
-                                    </button>
+                                    <div x-show="menuOpen" x-transition x-cloak class="absolute right-0 bottom-full mb-2 w-48 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
+                                        <div class="p-2 text-left">
+                                            <button @click="
+                                                selectedClassId = cls.id;
+                                                editFormData = {
+                                                    course: cls.course,
+                                                    room: cls.room,
+                                                    term: cls.term,
+                                                    class_time: cls.class_time,
+                                                };
+                                                showEditClassModal = true;
+                                                menuOpen = false;
+                                            " class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition cursor-pointer">
+                                                Edit Class
+                                            </button>
+
+                                            <button @click="
+                                                selectedClassId = cls.id;
+                                                selectedClassName = cls.course;
+                                                showEndClassModal = true;
+                                                menuOpen = false;
+                                            " class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl transition cursor-pointer">
+                                                Delete Class
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </template>
+            </div>
+        </template>
+
+        {{-- Empty State: No results or No data --}}
+        <template x-if="filteredClasses.length === 0">
+            <div class="py-20 bg-white rounded-[3rem] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-center px-6">
+                <div class="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center text-slate-300 mb-6">
+                    <template x-if="search">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                        </svg>
+                    </template>
+                    <template x-if="!search">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                        </svg>
+                    </template>
+                </div>
+
+                <h3 class="text-2xl font-black text-slate-800" x-text="search ? 'No matches found' : 'Welcome, ' + teacherName + '!'"></h3>
+                <p class="text-slate-500 font-bold mt-2 max-w-sm mx-auto"
+                   x-text="search ? 'We couldn\'t find any class matching \'' + search + '\'. Try checking your spelling or search for a different room.' : 'You haven\'t created any classes yet. Let\'s get your first course set up and ready for students.'">
+                </p>
+
+                <div class="mt-8 flex gap-3">
+                    <button x-show="search" @click="search = ''" class="px-6 py-3 bg-slate-100 text-slate-600 rounded-2xl font-black text-sm hover:bg-slate-200 transition cursor-pointer">
+                        Clear Search
+                    </button>
                 </div>
             </div>
         </template>
