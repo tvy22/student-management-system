@@ -150,7 +150,7 @@
     },
 
     async fetchStudents(classId) {
-        this.selectedClassId = classId;   
+        this.selectedClassId = classId;
         {{-- this.loading = true; // Use your existing loading state --}}
         try {
             const response = await fetch(`http://127.0.0.1:8000/api/class/${classId}`, {
@@ -182,11 +182,7 @@
 
         rows.forEach(row => {
             const studentId = row.getAttribute('data-student-id');
-
-            // Use the official Alpine utility to get data from the row
             const rowData = Alpine.$data(row);
-
-            {{-- const formattedDate = new Date(this.attendanceDate).toISOString().split('T')[0]; --}}
             const formattedDate = this.attendanceDate;
 
             if (rowData) {
@@ -220,20 +216,39 @@
 
             const responses = await Promise.all(requests);
 
+            // Check if every request was successful
             if (responses.every(r => r.ok)) {
                 this.$dispatch('notify', { message: 'Attendance Saved!', type: 'success' });
                 this.showTakeAttendanceModal = false;
-                // Optional: refresh the list if needed
             } else {
-                this.$dispatch('notify', { message: 'Failed to save attendance!', type: 'error' });
-                this.showTakeAttendanceModal = false;
+                // Find the first response that failed to extract its error message
+                const failedResponse = responses.find(r => !r.ok);
+                const errorData = await failedResponse.json();
+
+                let errorMessage = 'Failed to save attendance!';
+
+                // Check if there are specific validation errors (like the date error)
+                if (errorData.errors) {
+                    const firstKey = Object.keys(errorData.errors)[0];
+                    errorMessage = errorData.errors[firstKey][0];
+                } else if (errorData.message) {
+                    // Fallback to the top-level message if error object is missing
+                    errorMessage = errorData.message;
+                }
+
+                this.$dispatch('notify', { message: errorMessage, type: 'error' });
+
+                // Note: We don't necessarily close the modal on error
+                // so the user can fix the date/input and try again.
             }
         } catch (error) {
             console.error('Error saving attendance:', error);
+            this.$dispatch('notify', { message: 'Network error or server is down.', type: 'error' });
         } finally {
             this.loading = false;
         }
     }
+
 }">
 
     {{-- Stats Cards --}}
