@@ -19,17 +19,26 @@
                 <div>
                     <label class="block text-[10px] font-black text-gray-400 uppercase mb-3 ml-1">Change Status</label>
                     <div class="grid grid-cols-3 gap-3">
-                        <button type="button" @click="editAttendanceData.status = 'Present'"
-                            :class="editAttendanceData.status === 'Present' ? 'bg-green-500 text-white shadow-lg' : 'bg-gray-50 text-gray-400'"
-                            class="py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all">Present</button>
+                        <button type="button"
+                            @click="editAttendanceData.status = 'present'"
+                            :class="editAttendanceData.status?.toLowerCase() === 'present' ? 'bg-green-500 text-white shadow-lg' : 'bg-gray-50 text-gray-400'"
+                            class="py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all">
+                            Present
+                        </button>
 
-                        <button type="button" @click="editAttendanceData.status = 'Absent'"
-                            :class="editAttendanceData.status === 'Absent' ? 'bg-red-500 text-white shadow-lg' : 'bg-gray-50 text-gray-400'"
-                            class="py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all">Absent</button>
+                        <button type="button"
+                            @click="editAttendanceData.status = 'absent'"
+                            :class="editAttendanceData.status?.toLowerCase() === 'absent' ? 'bg-red-500 text-white shadow-lg' : 'bg-gray-50 text-gray-400'"
+                            class="py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all">
+                            Absent
+                        </button>
 
-                        <button type="button" @click="editAttendanceData.status = 'Late'"
-                            :class="editAttendanceData.status === 'Late' ? 'bg-amber-500 text-white shadow-lg' : 'bg-gray-50 text-gray-400'"
-                            class="py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all">Late</button>
+                        <button type="button"
+                            @click="editAttendanceData.status = 'permission'"
+                            :class="editAttendanceData.status?.toLowerCase() === 'permission' ? 'bg-amber-500 text-white shadow-lg' : 'bg-gray-50 text-gray-400'"
+                            class="py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all">
+                            Permission
+                        </button>
                     </div>
                 </div>
 
