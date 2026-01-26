@@ -218,12 +218,13 @@ async submitAttendance() {
                         <th class="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em]">Full Name</th>
                         <th class="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em]">Email</th>
                         <th class="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em]">Phone</th>
+                        <th class="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em] bg-slate-700 shadow-inner">Attendance Insight</th>
                         <th class="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                     <template x-if="loading">
-                        <tr><td colspan="5" class="py-20 text-center"><div class="animate-spin inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full"></div></td></tr>
+                        <tr><td colspan="6" class="py-20 text-center"><div class="animate-spin inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full"></div></td></tr>
                     </template>
 
                     <template x-for="student in filteredStudents" :key="student.id">
@@ -234,6 +235,52 @@ async submitAttendance() {
                             <td class="px-8 py-5"><span class="font-bold text-slate-600" x-text="student.name"></span></td>
                             <td class="px-8 py-5"><span class="font-bold text-slate-600" x-text="student.email"></span></td>
                             <td class="px-8 py-5"><span class="font-bold text-slate-600" x-text="student.phone"></span></td>
+
+                            {{-- <td class="px-8 py-4 bg-slate-50/80 border-x border-slate-100/50 relative overflow-hidden">
+                                <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500/20"></div>
+
+                                <div class="space-y-1.5">
+                                    <div class="flex justify-between items-center text-[10px] font-bold">
+                                        <span class="text-slate-400 uppercase tracking-wider">Total Records</span>
+                                        <span class="text-slate-700 bg-white px-2 py-0.5 rounded shadow-sm border border-slate-100">45</span>
+                                    </div>
+                                    <div class="flex justify-between items-center text-[10px] font-bold">
+                                        <span class="text-emerald-500 uppercase tracking-wider">Present</span>
+                                        <span class="text-emerald-600">38</span>
+                                    </div>
+                                    <div class="flex justify-between items-center text-[10px] font-bold">
+                                        <span class="text-rose-500 uppercase tracking-wider">Absent</span>
+                                        <span class="text-rose-600">4</span>
+                                    </div>
+                                    <div class="flex justify-between items-center text-[10px] font-bold">
+                                        <span class="text-amber-500 uppercase tracking-wider">Permission</span>
+                                        <span class="text-amber-600">3</span>
+                                    </div>
+                                    <div class="pt-1 mt-1 border-t border-slate-200/50 flex justify-between items-center">
+                                        <span class="text-[9px] font-black text-slate-500 uppercase">Avg. Attendance</span>
+                                        <span class="text-xs font-black text-blue-600">84.4%</span>
+                                    </div>
+                                </div>
+                            </td> --}}
+
+                            <td class="px-8 py-5 bg-slate-50/50 border-x border-slate-100">
+                                <div class="flex flex-col gap-2 w-40">
+                                    <div class="flex justify-between items-end">
+                                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Attendance</span>
+                                        <span class="text-xs font-black text-blue-600">84.4%</span>
+                                    </div>
+
+                                    <div class="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden flex">
+                                        <div class="bg-emerald-500 h-full" style="width: 70%"></div> <div class="bg-amber-400 h-full" style="width: 15%"></div>   <div class="bg-rose-500 h-full" style="width: 15%"></div>    </div>
+
+                                    <div class="flex gap-3 text-[9px] font-bold uppercase tracking-tighter">
+                                        <span class="text-emerald-600">P: 38</span>
+                                        <span class="text-rose-600">A: 4</span>
+                                        <span class="text-amber-600">L: 3</span>
+                                    </div>
+                                </div>
+                            </td>
+
                             <td class="px-8 py-5 text-center">
                                 <div class="flex items-center justify-center gap-2">
                                     <a href='/attendance' class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition cursor-pointer">
