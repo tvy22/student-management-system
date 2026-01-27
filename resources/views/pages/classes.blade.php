@@ -274,10 +274,17 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18c-2.305 0-4.408.867-6 2.292m0-14.25v14.25" />
                                             </svg>
                                         </div>
-                                        <h3 class="text-lg font-bold text-slate-800">No classes found</h3>
-                                        <p class="text-slate-400 font-medium text-sm max-w-62.5 mx-auto mt-1" x-text="search ? 'No classes match your search \'' + search + '\'' : 'You haven\'t added any classes to your schedule yet.'"></p>
 
-                                        <button @click="showAddClassModal = true" class="mt-6 flex items-center gap-2 px-5 py-2.5 bg-white border-2 border-slate-200 text-slate-600 rounded-xl font-bold text-sm hover:border-blue-500 hover:text-blue-600 transition cursor-pointer">
+                                        <h3 class="text-lg font-bold text-slate-800" x-text="search ? 'No results found' : 'No classes found'"></h3>
+
+                                        <p class="text-slate-400 font-medium text-sm max-w-62.5 mx-auto mt-1"
+                                        x-text="search ? 'No classes match \'' + search + '\'' : 'You haven\'t added any classes to your schedule yet.'">
+                                        </p>
+
+                                        {{-- ONLY show this button if there are absolutely NO classes in the database AND no search query --}}
+                                        <button x-show="!search && classes.length === 0"
+                                                @click="showAddClassModal = true"
+                                                class="mt-6 flex items-center gap-2 px-5 py-2.5 bg-white border-2 border-slate-200 text-slate-600 rounded-xl font-bold text-sm hover:border-blue-500 hover:text-blue-600 transition cursor-pointer">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
                                             <span>Create your first class</span>
                                         </button>

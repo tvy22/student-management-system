@@ -125,7 +125,6 @@
             // Use the official Alpine utility to get data from the row
             const rowData = Alpine.$data(row);
 
-            {{-- const formattedDate = new Date(this.attendanceDate).toISOString().split('T')[0]; --}}
             const formattedDate = this.attendanceDate;
 
             if (rowData) {
@@ -159,13 +158,23 @@
 
             const responses = await Promise.all(requests);
 
-            if (responses.every(r => r.ok)) {
+            const failedResponse = responses.find(r => !r.ok);
+
+            if (!failedResponse) {
                 this.$dispatch('notify', { message: 'Attendance Saved!', type: 'success' });
                 this.showTakeAttendanceModal = false;
                 window.dispatchEvent(new CustomEvent('refresh-student-list'));
             } else {
-                this.$dispatch('notify', { message: 'Failed to save attendance!', type: 'error' });
-                this.showTakeAttendanceModal = false;
+                
+                const errorData = await failedResponse.json();
+
+                // This tries to find 'message' or 'error' keys commonly sent by Laravel
+                const errorMessage = errorData.message || errorData.error || 'Failed to save attendance';
+
+                this.$dispatch('notify', {
+                    message: errorMessage,
+                    type: 'error'
+                });
             }
         } catch (error) {
             console.error('Error saving attendance:', error);
