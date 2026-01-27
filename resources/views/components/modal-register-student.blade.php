@@ -2,19 +2,55 @@
     class="fixed inset-0 z-100 overflow-y-auto"
     x-data="{
         studentForm: { name: '', email: '', phone: '' },
+        errors: {},
+        generalError: '',
         isSubmitting: false,
         localClassId: null,
 
         init() {
             window.addEventListener('open-register-modal', (e) => {
+                this.errors = {}; // Reset errors on open
+                this.generalError = ''; // Reset general error
+                this.studentForm = { name: '', email: '', phone: '' }; // Reset form
+
                 // If e.detail.id exists, it's an enrollment. If not, it's a general registration.
                 this.localClassId = e.detail ? e.detail.id : null;
             });
         },
 
+        // Handle API response and extract errors
+        handleApiError(response, result) {
+            // Reset previous errors
+            this.errors = {};
+            this.generalError = '';
+
+            if (response.status === 422) {
+                // Laravel validation errors
+                if (result.errors) {
+                    this.errors = result.errors;
+                }
+                // Also check for general message
+                if (result.message) {
+                    this.generalError = result.message;
+                }
+                return;
+            }
+
+            // Other error responses (400, 401, 403, 404, 500, etc.)
+            if (result.message) {
+                this.generalError = result.message;
+            } else if (result.error) {
+                this.generalError = result.error;
+            } else {
+                this.generalError = 'An unexpected error occurred. Please try again.';
+            }
+        },
+
         // Normal registration without class enrollment
         async submitGeneralStudent() {
             this.isSubmitting = true;
+            this.errors = {};
+            this.generalError = '';
             try {
                 const response = await fetch('http://127.0.0.1:8000/api/student/create', {
                     method: 'POST',
@@ -31,10 +67,11 @@
                 if (response.ok) {
                     this.successFeedback('Student created successfully');
                 } else {
-                    alert(result.message || 'Error occurred');
+                    this.handleApiError(response, result);
                 }
             } catch (error) {
                 console.error('Error:', error);
+                this.generalError = 'Network error. Please check your connection and try again.';
             } finally {
                 this.isSubmitting = false;
             }
@@ -43,6 +80,8 @@
         // Registration + Enrollment
         async submitStudentWithClass() {
             this.isSubmitting = true;
+            this.errors = {};
+            this.generalError = '';
             try {
                 const response = await fetch('http://127.0.0.1:8000/api/student', {
                     method: 'POST',
@@ -63,10 +102,11 @@
                     this.successFeedback('Student registered and enrolled.');
                     await fetchClasses(); // Refresh class counts
                 } else {
-                    alert(result.message || 'Error occurred');
+                    this.handleApiError(response, result);
                 }
             } catch (error) {
                 console.error('Error:', error);
+                this.generalError = 'Network error. Please check your connection and try again.';
             } finally {
                 this.isSubmitting = false;
             }
@@ -82,6 +122,8 @@
                 customClass: { popup: 'rounded-[2.5rem]' }
             });
             this.studentForm = { name: '', email: '', phone: '' };
+            this.errors = {};
+            this.generalError = '';
             this.localClassId = null; // Reset
             window.dispatchEvent(new CustomEvent('refresh-student-list'));
             showRegisterModal = false;
@@ -113,28 +155,59 @@
             <form @submit.prevent="localClassId ? submitStudentWithClass() : submitGeneralStudent()" class="p-8 space-y-6">
                 @csrf
 
+                {{-- General Error Message --}}
+                <template x-if="generalError">
+                    <div class="p-4 bg-red-50 border-2 border-red-200 rounded-2xl">
+                        <div class="flex items-start gap-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                            <p class="text-red-600 text-sm font-bold" x-text="generalError"></p>
+                        </div>
+                    </div>
+                </template>
+
                 <div class="space-y-5">
                     {{-- Full Name --}}
                     <div>
-                        <label class="block text-xs font-black text-red-400 uppercase mb-2 ml-1">Full Name</label>
-                        <input x-model="studentForm.name" type="text" name="name" placeholder="John Doe" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition font-bold text-slate-700" required>
+                        <label class="block text-xs font-black uppercase mb-2 ml-1" :class="errors.name ? 'text-red-500' : 'text-slate-400'">Full Name</label>
+                        <input x-model="studentForm.name" type="text"
+                            :class="errors.name ? 'border-red-300 bg-red-50' : 'border-gray-100 bg-gray-50'"
+                            class="w-full px-5 py-4 border-2 rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition font-bold text-slate-700"
+                            placeholder="John Doe">
+                        <template x-if="errors.name">
+                            <p class="text-red-500 text-[10px] font-bold mt-2 ml-1 uppercase" x-text="errors.name[0]"></p>
+                        </template>
                     </div>
 
                     {{-- Email --}}
                     <div>
-                        <label class="block text-xs font-black text-red-400 uppercase mb-2 ml-1">Email</label>
-                        <input x-model="studentForm.email" type="email" name="email" placeholder="john@gmail.com" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition font-bold text-slate-700" required>
+                        <label class="block text-xs font-black uppercase mb-2 ml-1" :class="errors.email ? 'text-red-500' : 'text-slate-400'">Email Address</label>
+                        <input x-model="studentForm.email" type="email"
+                            :class="errors.email ? 'border-red-300 bg-red-50' : 'border-gray-100 bg-gray-50'"
+                            class="w-full px-5 py-4 border-2 rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition font-bold text-slate-700"
+                            placeholder="john@gmail.com">
+                        <template x-if="errors.email">
+                            <p class="text-red-500 text-[10px] font-bold mt-2 ml-1 uppercase" x-text="errors.email[0]"></p>
+                        </template>
                     </div>
 
                     {{-- Phone Number --}}
                     <div>
-                        <label class="block text-xs font-black text-red-400 uppercase mb-2 ml-1">Phone Number</label>
-                        <input x-model="studentForm.phone" type="text" name="phone" placeholder="012 345 678" class="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition font-bold text-slate-700" required>
+                        <label class="block text-xs font-black uppercase mb-2 ml-1" :class="errors.phone ? 'text-red-500' : 'text-slate-400'">Phone Number</label>
+                        <input x-model="studentForm.phone" type="text"
+                            :class="errors.phone ? 'border-red-300 bg-red-50' : 'border-gray-100 bg-gray-50'"
+                            class="w-full px-5 py-4 border-2 rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition font-bold text-slate-700"
+                            placeholder="012 345 678">
+                        <template x-if="errors.phone">
+                            <p class="text-red-500 text-[10px] font-bold mt-2 ml-1 uppercase" x-text="errors.phone[0]"></p>
+                        </template>
                     </div>
                 </div>
 
                 <div class="pt-2">
-                    <button type="submit" :disabled="isSubmitting" class="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-lg shadow-blue-200 transition-all transform active:scale-[0.98] cursor-pointer flex justify-center items-center">
+                    <button type="submit" :disabled="isSubmitting"
+                        class="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-lg shadow-blue-200 transition-all transform active:scale-[0.98] cursor-pointer flex justify-center items-center disabled:opacity-50">
                         <span x-show="!isSubmitting" x-text="localClassId ? 'Enroll Student' : 'Create Student'"></span>
                         <span x-show="isSubmitting" class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
                     </button>
