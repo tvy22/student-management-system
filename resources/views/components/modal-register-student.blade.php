@@ -6,16 +6,57 @@
         generalError: '',
         isSubmitting: false,
         localClassId: null,
+        phoneError: '',
+        emailError: '',
 
         init() {
             window.addEventListener('open-register-modal', (e) => {
                 this.errors = {}; // Reset errors on open
                 this.generalError = ''; // Reset general error
+                this.phoneError = ''; // Reset phone error
+                this.emailError = ''; // Reset email error
                 this.studentForm = { name: '', email: '', phone: '' }; // Reset form
 
                 // If e.detail.id exists, it's an enrollment. If not, it's a general registration.
                 this.localClassId = e.detail ? e.detail.id : null;
             });
+        },
+
+        // Validate email format
+        isValidEmail(email) {
+            if (!email || email.trim() === '') return true; // Allow empty (backend will handle required validation)
+            // Email must have: text before @, domain after @, at least one dot in domain, characters after dot
+            // Pattern: something@domain.extension
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        },
+
+        // Validate email and set error message
+        validateEmail() {
+            if (!this.isValidEmail(this.studentForm.email)) {
+                this.emailError = 'Please enter a valid email address.';
+                return false;
+            }
+            this.emailError = '';
+            return true;
+        },
+
+        // Validate phone number format
+        isValidPhone(phone) {
+            if (!phone || phone.trim() === '') return true; // Allow empty (backend will handle required validation)
+            // Allow: digits, optional + at start, spaces, dashes
+            const phoneRegex = /^\+?[\d\s\-]+$/;
+            return phoneRegex.test(phone);
+        },
+
+        // Validate phone and set error message
+        validatePhone() {
+            if (!this.isValidPhone(this.studentForm.phone)) {
+                this.phoneError = 'Please enter a valid phone number.';
+                return false;
+            }
+            this.phoneError = '';
+            return true;
         },
 
         // Handle API response and extract errors
@@ -48,6 +89,12 @@
 
         // Normal registration without class enrollment
         async submitGeneralStudent() {
+            // Validate email and phone before submission
+            const isEmailValid = this.validateEmail();
+            const isPhoneValid = this.validatePhone();
+            if (!isEmailValid || !isPhoneValid) {
+                return;
+            }
             this.isSubmitting = true;
             this.errors = {};
             this.generalError = '';
@@ -79,6 +126,12 @@
 
         // Registration + Enrollment
         async submitStudentWithClass() {
+            // Validate email and phone before submission
+            const isEmailValid = this.validateEmail();
+            const isPhoneValid = this.validatePhone();
+            if (!isEmailValid || !isPhoneValid) {
+                return;
+            }
             this.isSubmitting = true;
             this.errors = {};
             this.generalError = '';
@@ -124,6 +177,8 @@
             this.studentForm = { name: '', email: '', phone: '' };
             this.errors = {};
             this.generalError = '';
+            this.phoneError = ''; // Reset phone error
+            this.emailError = ''; // Reset email error
             this.localClassId = null; // Reset
             window.dispatchEvent(new CustomEvent('refresh-student-list'));
             showRegisterModal = false;
@@ -159,7 +214,7 @@
                 <template x-if="generalError">
                     <div class="p-4 bg-red-50 border-2 border-red-200 rounded-2xl">
                         <div class="flex items-start gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500 shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                             </svg>
                             <p class="text-red-600 text-sm font-bold" x-text="generalError"></p>
@@ -170,7 +225,7 @@
                 <div class="space-y-5">
                     {{-- Full Name --}}
                     <div>
-                        <label class="block text-xs font-black uppercase mb-2 ml-1" :class="errors.name ? 'text-red-500' : 'text-slate-400'">Full Name</label>
+                        <label class="block text-xs font-black uppercase mb-2 ml-1" :class="errors.name ? 'text-red-500' : 'text-gray-700'">Full Name</label>
                         <input x-model="studentForm.name" type="text"
                             :class="errors.name ? 'border-red-300 bg-red-50' : 'border-gray-100 bg-gray-50'"
                             class="w-full px-5 py-4 border-2 rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition font-bold text-slate-700"
@@ -182,24 +237,34 @@
 
                     {{-- Email --}}
                     <div>
-                        <label class="block text-xs font-black uppercase mb-2 ml-1" :class="errors.email ? 'text-red-500' : 'text-slate-400'">Email Address</label>
+                        <label class="block text-xs font-black uppercase mb-2 ml-1" :class="errors.email || emailError ? 'text-red-500' : 'text-gray-700'">Email Address</label>
                         <input x-model="studentForm.email" type="email"
-                            :class="errors.email ? 'border-red-300 bg-red-50' : 'border-gray-100 bg-gray-50'"
+                            @input="validateEmail()"
+                            @blur="validateEmail()"
+                            :class="errors.email || emailError ? 'border-red-300 bg-red-50' : 'border-gray-100 bg-gray-50'"
                             class="w-full px-5 py-4 border-2 rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition font-bold text-slate-700"
                             placeholder="john@gmail.com">
-                        <template x-if="errors.email">
+                        <template x-if="emailError">
+                            <p class="text-red-500 text-[10px] font-bold mt-2 ml-1 uppercase" x-text="emailError"></p>
+                        </template>
+                        <template x-if="errors.email && !emailError">
                             <p class="text-red-500 text-[10px] font-bold mt-2 ml-1 uppercase" x-text="errors.email[0]"></p>
                         </template>
                     </div>
 
                     {{-- Phone Number --}}
                     <div>
-                        <label class="block text-xs font-black uppercase mb-2 ml-1" :class="errors.phone ? 'text-red-500' : 'text-slate-400'">Phone Number</label>
+                        <label class="block text-xs font-black uppercase mb-2 ml-1" :class="errors.phone || phoneError ? 'text-red-500' : 'text-gray-700'">Phone Number</label>
                         <input x-model="studentForm.phone" type="text"
-                            :class="errors.phone ? 'border-red-300 bg-red-50' : 'border-gray-100 bg-gray-50'"
+                            @input="validatePhone()"
+                            @blur="validatePhone()"
+                            :class="errors.phone || phoneError ? 'border-red-300 bg-red-50' : 'border-gray-100 bg-gray-50'"
                             class="w-full px-5 py-4 border-2 rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition font-bold text-slate-700"
                             placeholder="012 345 678">
-                        <template x-if="errors.phone">
+                        <template x-if="phoneError">
+                            <p class="text-red-500 text-[10px] font-bold mt-2 ml-1 uppercase" x-text="phoneError"></p>
+                        </template>
+                        <template x-if="errors.phone && !phoneError">
                             <p class="text-red-500 text-[10px] font-bold mt-2 ml-1 uppercase" x-text="errors.phone[0]"></p>
                         </template>
                     </div>
