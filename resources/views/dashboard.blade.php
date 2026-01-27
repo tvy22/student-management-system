@@ -308,79 +308,84 @@
         {{-- Success: Show Classes --}}
         <template x-if="filteredClasses.length > 0">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <template x-for="cls in filteredClasses" :key="cls.id">
-                    <div class="bg-white rounded-3xl shadow-sm border border-gray-300 overflow-hidden hover:shadow-xl transition-all duration-300 group">
-                        <div class="p-5 bg-blue-200 border-b border-gray-100 group-hover:bg-blue-300 transition-colors">
-                            <h3 class="text-xl font-black text-slate-800 leading-tight" x-text="cls.course"></h3>
-                        </div>
+<template x-for="cls in filteredClasses" :key="cls.id">
+    <div class="bg-white rounded-3xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 group">
+        <!-- Card Header -->
+        <div class="p-5 bg-gradient-to-r from-blue-100 to-blue-200 border-b border-gray-100 group-hover:from-blue-200 group-hover:to-blue-300 transition-colors">
+            <h3 class="text-xl md:text-2xl font-extrabold text-slate-800 leading-tight truncate" x-text="cls.course"></h3>
+        </div>
 
-                        <div class="p-6 ">
-                            <div class="grid grid-cols-2 gap-y-4 gap-x-2">
-                                <div>
-                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Term</p>
-                                    <p class="text-sm font-bold text-slate-700" x-text="cls.term"></p>
-                                </div>
-                                <div>
-                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Room</p>
-                                    <p class="text-sm font-bold text-slate-700" x-text="cls.room"></p>
-                                </div>
-                                <div>
-                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Teacher</p>
-                                    <p class="text-sm font-bold text-slate-700" x-text="teacherName"></p>
-                                </div>
-                                <div>
-                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Time</p>
-                                    <p class="text-sm font-bold text-slate-700" x-text="cls.class_time"></p>
-                                </div>
-                            </div>
+        <!-- Card Content -->
+        <div class="p-6">
+            <div class="grid grid-cols-2 gap-y-4 gap-x-4">
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Term</p>
+                    <p class="text-sm font-semibold text-slate-700" x-text="cls.term"></p>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Room</p>
+                    <p class="text-sm font-semibold text-slate-700" x-text="cls.room"></p>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Teacher</p>
+                    <p class="text-sm font-semibold text-slate-700" x-text="teacherName"></p>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Time</p>
+                    <p class="text-sm font-semibold text-slate-700" x-text="cls.class_time"></p>
+                </div>
+            </div>
 
-                            <div class="mt-6 pt-4 border-t border-dashed border-gray-200 flex items-center justify-between gap-2">
-                                <a :href="'/student/' + cls.id" class="flex-1 flex items-center justify-center gap-1.5 px-2 py-3 bg-blue-50 text-blue-700 rounded-xl font-bold text-[10px] hover:bg-blue-100 transition active:scale-95 group uppercase tracking-tighter whitespace-nowrap">
-                                    <span>Students</span>
-                                </a>
+            <!-- Action Buttons -->
+            <div class="mt-6 pt-4 border-t border-gray-200 flex items-center justify-between gap-2">
+                <a :href="'/student/' + cls.id" class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-blue-50 text-blue-700 rounded-xl font-bold text-xs hover:bg-blue-100 hover:shadow-sm transition active:scale-95 group uppercase tracking-wide whitespace-nowrap">
+                    <span>Students</span>
+                </a>
 
-                                <button @click="fetchStudents(cls.id)" class="flex-1 flex items-center justify-center gap-1.5 px-2 py-3 bg-green-500 text-white rounded-xl font-bold text-[10px] hover:bg-green-700 transition active:scale-95 shadow-sm shadow-green-100 uppercase tracking-tighter whitespace-nowrap cursor-pointer">
-                                    <span>Attendance</span>
-                                </button>
+                <button @click="fetchStudents(cls.id)" class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-green-500 text-white rounded-xl font-bold text-xs hover:bg-green-600 hover:shadow-md transition active:scale-95 uppercase tracking-wide whitespace-nowrap cursor-pointer">
+                    <span>Attendance</span>
+                </button>
 
-                                <div class="relative shrink-0" x-data="{ menuOpen: false }">
-                                    <button @click="menuOpen = !menuOpen" @click.away="menuOpen = false" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition cursor-pointer">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
-                                        </svg>
-                                    </button>
+                <!-- Overflow Menu -->
+                <div class="relative shrink-0" x-data="{ menuOpen: false }">
+                    <button @click="menuOpen = !menuOpen" @click.away="menuOpen = false" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
+                        </svg>
+                    </button>
 
-                                    <div x-show="menuOpen" x-transition x-cloak class="absolute right-0 bottom-full mb-2 w-48 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
-                                        <div class="p-2 text-left">
-                                            <button @click="
-                                                selectedClassId = cls.id;
-                                                editFormData = {
-                                                    course: cls.course,
-                                                    room: cls.room,
-                                                    term: cls.term,
-                                                    class_time: cls.class_time,
-                                                };
-                                                showEditClassModal = true;
-                                                menuOpen = false;
-                                            " class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition cursor-pointer">
-                                                Edit Class
-                                            </button>
+                    <div x-show="menuOpen" x-transition x-cloak class="absolute right-0 bottom-full mb-2 w-48 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
+                        <div class="p-2 text-left">
+                            <button @click="
+                                selectedClassId = cls.id;
+                                editFormData = {
+                                    course: cls.course,
+                                    room: cls.room,
+                                    term: cls.term,
+                                    class_time: cls.class_time,
+                                };
+                                showEditClassModal = true;
+                                menuOpen = false;
+                            " class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition cursor-pointer">
+                                Edit Class
+                            </button>
 
-                                            <button @click="
-                                                selectedClassId = cls.id;
-                                                selectedClassName = cls.course;
-                                                showEndClassModal = true;
-                                                menuOpen = false;
-                                            " class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl transition cursor-pointer">
-                                                Delete Class
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <button @click="
+                                selectedClassId = cls.id;
+                                selectedClassName = cls.course;
+                                showEndClassModal = true;
+                                menuOpen = false;
+                            " class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl transition cursor-pointer">
+                                Delete Class
+                            </button>
                         </div>
                     </div>
-                </template>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
             </div>
         </template>
 

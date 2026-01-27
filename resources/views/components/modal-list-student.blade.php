@@ -6,11 +6,13 @@
         loading: false,
         showListModal: false,
         currentClassId: null,
+        enrolledIds: [],
 
         init() {
             // Listen for the signal to open this specific modal
             window.addEventListener('open-list-student-modal', async (e) => {
                 this.currentClassId = e.detail.id;
+                this.enrolledIds = e.detail.enrolledIds || [];
                 console.log('Class ID received in modal:', this.currentClassId);
                 this.$data.showListModal = true;
                 await this.fetchStudents();
@@ -45,6 +47,17 @@
         },
 
         async enrollExistingStudent(studentId) {
+
+            if (this.enrolledIds.includes(studentId)) {
+                    Swal.fire({
+                        title: 'Already Enrolled',
+                        text: 'This student is already a member of this class.',
+                        icon: 'info',
+                        confirmButtonColor: '#3b82f6',
+                        customClass: { popup: 'rounded-[2rem]' }
+                    });
+                    return; // Stop the function here
+                }
 
             if (!this.currentClassId) {
                 console.error('Enrollment failed: No Class ID found');
@@ -140,9 +153,18 @@
                                     </div>
                                 </td>
                                 <td class="px-4 py-4 text-right">
-                                    <button @click="enrollExistingStudent(student.id), console.log('Student ID:', student.id, ', Class ID:', currentClassId)" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-xs transition active:scale-95 cursor-pointer">
-                                        Add to Class
-                                    </button>
+                                    <template x-if="enrolledIds.includes(student.id)">
+                                        <span class="px-4 py-2 bg-slate-300 text-slate-600 rounded-xl font-black text-xs">
+                                            Already in Class
+                                        </span>
+                                    </template>
+
+                                    <template x-if="!enrolledIds.includes(student.id)">
+                                        <button @click="enrollExistingStudent(student.id)"
+                                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-xs transition active:scale-95 cursor-pointer">
+                                            Add to Class
+                                        </button>
+                                    </template>
                                 </td>
                             </tr>
                         </template>
