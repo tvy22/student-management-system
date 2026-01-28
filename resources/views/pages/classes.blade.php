@@ -47,6 +47,10 @@
             window.addEventListener('refresh-class-list', async () => {
                 await this.fetchClasses();
             });
+
+            window.addEventListener('pageshow', () => {
+                this.fetchClasses();
+            });
         },
 
         async fetchClasses() {
@@ -54,6 +58,7 @@
             try {
                 const response = await fetch('http://127.0.0.1:8000/api/class', {
                     method: 'GET',
+                    cache: 'no-store',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('school_token')}`,
                         'Accept': 'application/json'
