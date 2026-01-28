@@ -7,7 +7,8 @@
     loading: true,
     showRegisterModal: false,
     showEditStudentModal: false,
-    showDeleteStudentModal: false,
+    {{-- showDeleteStudentModal: false, --}}
+    showRemoveStudentModal: false,
     showTakeAttendanceModal: false,
     attendanceDate: '{{ date('Y-m-d') }}',
     selectedStudentToDelete: { id: null, name: '' },
@@ -46,17 +47,18 @@
             this.showEditStudentModal = false;
         });
 
-        window.addEventListener('open-delete-student', (e) => {
+        window.addEventListener('open-remove-student', (e) => {
             const studentId = e.detail;
             const student = this.students.find(s => s.id === studentId);
             if (student) {
-                this.selectedStudentToDelete = { id: student.id, name: student.name };
-                this.showDeleteStudentModal = true;
+                this.selectedStudentToRemove = { id: student.id, name: student.name };
+                this.selectedClassId = this.classId;
+                this.showRemoveStudentModal = true;
             }
         });
 
-        window.addEventListener('close-delete-student', () => {
-            this.showDeleteStudentModal = false;
+        window.addEventListener('close-remove-student', () => {
+            this.showRemoveStudentModal = false;
         });
 
     },
@@ -348,7 +350,7 @@
                                         <button @click="$dispatch('open-edit-student', student.id)" class="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-100 rounded-lg transition-all duration-200 cursor-pointer hover:shadow-md hover:scale-105">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                         </button>
-                                        <button @click="$dispatch('open-delete-student', student.id)" class="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-100 rounded-lg transition-all duration-200 cursor-pointer hover:shadow-md hover:scale-105">
+                                        <button @click="$dispatch('open-remove-student', student.id)" class="p-2.5 text-slate-400 hover:text-amber-600 hover:bg-amber-100 rounded-lg transition-all duration-200 cursor-pointer hover:shadow-md hover:scale-105">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                         </button>
                                     </div>
@@ -381,7 +383,7 @@
     {{-- Modals --}}
     <x-modal-register-student />
     <x-modal-edit-student />
-    <x-modal-delete-student />
+    <x-modal-remove-from-class/>
     <x-modal-list-student />
     <x-modal-take-class-attendance />
     <x-modal-attendance-history/>
