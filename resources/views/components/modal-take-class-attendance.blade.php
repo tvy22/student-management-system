@@ -9,99 +9,106 @@
     class="fixed inset-0 z-50 overflow-hidden"
     style="display: none;"
 >
-    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-md"></div>
 
     <div class="relative min-h-screen flex items-center justify-center p-4 md:p-8">
-        <div class="bg-slate-50 w-full max-w-7xl rounded-[3rem] shadow-2xl overflow-hidden border border-white relative">
+        <div class="bg-slate-50 w-full max-w-7xl rounded-[3rem] shadow-2xl overflow-hidden border border-white/20 relative">
 
             <div class="p-0 max-h-[90vh] flex flex-col">
 
-                <div class="sticky top-0 z-20 bg-slate-50 p-8 md:p-12 pb-4 shadow-sm ">
-                    {{-- Header Section --}}
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-                        <div class="flex items-center gap-4">
-                            <button @click="showTakeAttendanceModal = false" class="p-3 bg-white border border-gray-100 rounded-2xl text-slate-400 hover:text-red-600 hover:border-red-100 transition shadow-sm cursor-pointer">
+                {{-- Header Section --}}
+                <div class="sticky top-0 z-20 bg-slate-50/80 backdrop-blur-xl p-6 md:p-10 pb-6 border-b border-slate-200/60">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
+                        <div class="flex items-center gap-5">
+                            <button @click="showTakeAttendanceModal = false" class="p-3.5 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-red-600 hover:border-red-100 hover:bg-red-50 transition-all shadow-sm cursor-pointer active:scale-90">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
                             <div>
                                 <h1 class="text-3xl font-black text-slate-800 tracking-tight">Daily Attendance</h1>
-                                <p class="text-slate-400 font-bold uppercase text-xs tracking-widest" x-text="classInfo.course_name"></p>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-md text-[10px] font-black uppercase tracking-wider" x-text="classInfo.course_name"></span>
+                                    <span class="text-slate-300">•</span>
+                                    <p class="text-slate-400 font-bold text-xs uppercase tracking-widest">Marking Session</p>
+                                </div>
                             </div>
                         </div>
 
                         <div class="flex items-center gap-3">
-                            <input type="date"
-                                   x-model="attendanceDate"
-                                   readonly
-                                   class="px-5 py-3 bg-white border-2 border-gray-100 rounded-2xl font-bold text-slate-700 outline-none focus:border-blue-500 transition shadow-sm">
-                            <button @click="submitAttendance()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-blue-200 transition active:scale-95 flex items-center gap-2 cursor-pointer">
-                                Save Attendance
+                            <div class="relative">
+                                <input type="date" x-model="attendanceDate" readonly class="pl-5 pr-10 py-3 bg-white border border-slate-200 rounded-2xl font-bold text-slate-600 outline-none shadow-sm cursor-default">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute right-3 top-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                            </div>
+                            <button @click="submitAttendance()" class="bg-blue-600 hover:bg-blue-700 text-white font-black py-3.5 px-8 rounded-2xl shadow-xl shadow-blue-500/20 transition-all active:scale-95 flex items-center gap-2 cursor-pointer border-b-4 border-blue-800">
+                                Save Changes
                             </button>
                         </div>
                     </div>
 
                     {{-- Quick Tools --}}
-                    <div class="bg-indigo-50 border border-indigo-100 rounded-4xl p-4 flex flex-wrap items-center justify-between gap-4">
+                    <div class="bg-white border border-slate-200 rounded-4xl p-3 flex flex-wrap items-center justify-between gap-4 shadow-sm">
                         <div class="flex items-center gap-3 px-4">
-                            <div class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></div>
-                            <p class="text-indigo-900 font-bold text-sm">Marking attendance for all students</p>
+                            <div class="flex -space-x-2">
+                                <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                            </div>
+                            <p class="text-slate-600 font-bold text-sm tracking-tight">Active Session: <span class="text-slate-900" x-text="students.length + ' Students'"></span></p>
                         </div>
-                        <button @click="$dispatch('mark-all-present')" class="px-6 py-2.5 bg-white text-indigo-600 font-black text-xs uppercase tracking-widest rounded-xl shadow-sm hover:bg-indigo-600 hover:text-white transition-all active:scale-95 cursor-pointer">
+                        <button @click="$dispatch('mark-all-present')" class="px-6 py-2.5 bg-slate-900 text-white font-black text-[10px] uppercase tracking-widest rounded-xl shadow-lg hover:bg-blue-600 transition-all active:scale-95 cursor-pointer">
                             Mark All Present
                         </button>
                     </div>
                 </div>
 
-                {{-- 2. Scrollable Table Area --}}
-                <div class="p-8 md:p-12 pt-0 overflow-y-auto grow">
-                    <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden mb-4">
+                {{-- Scrollable Table Area --}}
+                <div class="p-6 md:p-10 pt-4 overflow-y-auto grow">
+                    <div class="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden mb-4">
 
-                        {{-- Show Table if Students Exist --}}
                         <template x-if="students.length > 0">
                             <table class="w-full text-left border-collapse">
-                                <thead class="sticky top-0 z-10">
-                                    <tr class="bg-slate-800 border-b border-slate-700">
-                                        <th class="p-6 text-[10px] font-black text-slate-300 uppercase tracking-widest">Student Information</th>
-                                        <th class="p-6 text-[10px] font-black text-slate-300 uppercase tracking-widest text-center">Status</th>
-                                        <th class="p-6 text-[10px] font-black text-slate-300 uppercase tracking-widest">Remark</th>
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-100">
+                                        <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Student Details</th>
+                                        <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Attendance Status</th>
+                                        <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Reason / Remark</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-50">
+                                <tbody class="divide-y divide-slate-50">
                                     <template x-for="student in students" :key="student.id">
-                                        <tr class="attendance-row hover:bg-slate-50/50 transition"
+                                        <tr class="attendance-row group hover:bg-blue-50/30 transition-all duration-200 border-l-4 border-transparent hover:border-blue-500"
                                             :data-student-id="student.id"
                                             x-data="{ status: 'present', note: '' }"
                                             @mark-all-present.window="status = 'present'">
 
                                             <td class="p-6">
-                                                <div class="flex items-center gap-4">
-                                                    <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center font-black text-sm"
+                                                <div class="flex items-center gap-5">
+                                                    <div class="w-14 h-14 bg-linear-to-br from-slate-700 to-slate-900 text-white rounded-2xl flex items-center justify-center font-black text-sm shadow-md"
                                                         x-text="student.name.split(' ').map(n => n[0]).join('').toUpperCase()">
                                                     </div>
                                                     <div>
-                                                        <p class="font-black text-slate-800 text-lg transition" x-text="student.name"></p>
-                                                        <p class="text-xs font-bold text-slate-400 uppercase" x-text="'ID: ' + student.id"></p>
+                                                        <p class="font-black text-slate-800 text-lg leading-tight" x-text="student.name"></p>
+                                                        <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest mt-1" x-text="'ID: ' + student.id"></p>
                                                     </div>
                                                 </div>
                                             </td>
 
-                                            <td class="p-6 text-center">
-                                                <div class="flex items-center justify-center gap-2">
-                                                    <button @click="status = 'present'" :class="status === 'present' ? 'bg-green-500 text-white shadow-lg shadow-green-200' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'" class="px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Present</button>
-                                                    <button @click="status = 'absent'" :class="status === 'absent' ? 'bg-red-500 text-white shadow-lg shadow-red-200' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'" class="px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Absent</button>
-                                                    <button @click="status = 'permission'" :class="status === 'permission' ? 'bg-amber-500 text-white shadow-lg shadow-amber-200' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'" class="px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Permission</button>
+                                            <td class="p-6">
+                                                <div class="flex items-center justify-center">
+                                                    <div class="inline-flex bg-slate-100 p-1.5 rounded-3xl border border-slate-200/50">
+                                                        <button @click="status = 'present'" :class="status === 'present' ? 'bg-white text-emerald-600 shadow-sm ring-1 ring-slate-200' : 'text-slate-400 hover:text-slate-600'" class="px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Present</button>
+                                                        <button @click="status = 'absent'" :class="status === 'absent' ? 'bg-white text-red-600 shadow-sm ring-1 ring-slate-200' : 'text-slate-400 hover:text-slate-600'" class="px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Absent</button>
+                                                        <button @click="status = 'permission'" :class="status === 'permission' ? 'bg-white text-amber-600 shadow-sm ring-1 ring-slate-200' : 'text-slate-400 hover:text-slate-600'" class="px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Permission</button>
+                                                    </div>
                                                 </div>
                                             </td>
 
                                             <td class="p-6">
                                                 <input type="text"
                                                     x-model="note"
-                                                    placeholder="Add reason..."
+                                                    placeholder="Reason for absence..."
                                                     :disabled="status !== 'permission'"
-                                                    :class="status === 'permission' ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-gray-50 border-gray-100 text-gray-400 cursor-not-allowed'"
-                                                    class="w-full px-4 py-3 border-2 rounded-xl text-sm font-bold transition-all outline-none focus:border-blue-500">
+                                                    :class="status === 'permission' ? 'bg-amber-50/50 border-amber-200 text-amber-900 focus:ring-4 focus:ring-amber-50' : 'bg-slate-50 border-slate-100 text-slate-300 cursor-not-allowed'"
+                                                    class="w-full px-5 py-3 border-2 rounded-2xl text-xs font-bold transition-all outline-none">
                                             </td>
                                         </tr>
                                     </template>
@@ -109,17 +116,17 @@
                             </table>
                         </template>
 
-                        {{-- Empty State: No Students in Class --}}
+                        {{-- Empty State --}}
                         <template x-if="students.length === 0">
-                            <div class="py-24 flex flex-col items-center justify-center text-center px-6">
-                                <div class="w-24 h-24 bg-slate-50 rounded-4xl flex items-center justify-center text-slate-300 mb-6 border-2 border-dashed border-slate-200">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.998 5.998 0 0 0-12 0m12 0c0-1.223-.367-2.361-.996-3.304m-11.008 3.304a5.997 5.997 0 0 1 .996-3.304m11.008 3.304A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.997 5.997 0 0 0-1.004-3.304M6.004 18.719A5.997 5.997 0 0 1 7 15.415m0 0a5.998 5.998 0 0 1 10 0m-10 0a5.998 5.998 0 0 0 10 0m-10 0V15a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v.415m-10 0h10" />
+                            <div class="py-32 flex flex-col items-center justify-center text-center px-6">
+                                <div class="w-24 h-24 bg-slate-100 rounded-[2.5rem] flex items-center justify-center text-slate-300 mb-6 border-4 border-white shadow-inner">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                                     </svg>
                                 </div>
-                                <h3 class="text-2xl font-black text-slate-800">No Students Enrolled</h3>
-                                <p class="text-slate-500 font-bold mt-2 max-w-sm mx-auto">
-                                    This class doesn't have any students yet. You need to enroll students before you can take attendance.
+                                <h3 class="text-2xl font-black text-slate-800">Class Roster Empty</h3>
+                                <p class="text-slate-400 font-bold mt-2 max-w-sm mx-auto text-sm uppercase tracking-wide">
+                                    No students found for this class.
                                 </p>
                             </div>
                         </template>
