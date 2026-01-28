@@ -32,7 +32,10 @@
                         </div>
 
                         <div class="flex items-center gap-3">
-                            <input type="date" x-model="attendanceDate" class="px-5 py-3 bg-white border-2 border-gray-100 rounded-2xl font-bold text-slate-700 outline-none focus:border-blue-500 transition shadow-sm">
+                            <input type="date"
+                                   x-model="attendanceDate"
+                                   readonly
+                                   class="px-5 py-3 bg-white border-2 border-gray-100 rounded-2xl font-bold text-slate-700 outline-none focus:border-blue-500 transition shadow-sm">
                             <button @click="submitAttendance()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-blue-200 transition active:scale-95 flex items-center gap-2 cursor-pointer">
                                 Save Attendance
                             </button>
