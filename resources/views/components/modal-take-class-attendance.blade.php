@@ -40,8 +40,18 @@
                                 <input type="date" x-model="attendanceDate" readonly class="pl-5 pr-10 py-3 bg-white border border-slate-200 rounded-2xl font-bold text-slate-600 outline-none shadow-sm cursor-default">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute right-3 top-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                             </div>
-                            <button @click="submitAttendance()" class="bg-blue-600 hover:bg-blue-700 text-white font-black py-3.5 px-8 rounded-2xl shadow-xl shadow-blue-500/20 transition-all active:scale-95 flex items-center gap-2 cursor-pointer border-b-4 border-blue-800">
-                                Save Changes
+                            <button @click="submitAttendance()"
+                                    :disabled="loading"
+                                    class="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-black py-3.5 px-8 rounded-2xl shadow-xl shadow-blue-500/20 transition-all active:scale-95 flex items-center gap-2 cursor-pointer border-b-4 border-blue-800">
+                                <template x-if="!loading">
+                                    <span>Save</span>
+                                </template>
+                                <template x-if="loading">
+                                    <div class="flex items-center gap-2">
+                                        <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                        <span>Saving...</span>
+                                    </div>
+                                </template>
                             </button>
                         </div>
                     </div>
@@ -74,16 +84,29 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-50">
-                                    <template x-for="student in students" :key="student.id">
+                                    <template x-for="(student, index) in students" :key="student.id">
                                         <tr class="attendance-row group hover:bg-blue-50/30 transition-all duration-200 border-l-4 border-transparent hover:border-blue-500"
                                             :data-student-id="student.id"
-                                            x-data="{ status: 'present', note: '' }"
+                                            x-data="{
+                                                {{-- This is the magic part: it syncs with the parent 'students' array --}}
+                                                status: student.today_record ? student.today_record.status : 'present',
+                                                note: student.today_record ? student.today_record.remark : ''
+                                            }"
+                                            {{-- Watch for changes and update the parent array immediately --}}
+                                            x-init="$watch('status', v => { if(!student.today_record) student.today_record = {}; student.today_record.status = v })
+                                                    $watch('note', v => { if(!student.today_record) student.today_record = {}; student.today_record.remark = v })"
                                             @mark-all-present.window="status = 'present'">
 
                                             <td class="p-6">
                                                 <div class="flex items-center gap-5">
-                                                    <div class="w-14 h-14 bg-linear-to-br from-slate-700 to-slate-900 text-white rounded-2xl flex items-center justify-center font-black text-sm shadow-md"
-                                                        x-text="student.name.split(' ').map(n => n[0]).join('').toUpperCase()">
+                                                    <div class="relative">
+                                                        <div class="w-14 h-14 bg-slate-800 text-white rounded-2xl flex items-center justify-center font-black text-sm shadow-md"
+                                                            x-text="student.name.split(' ').map(n => n[0]).join('').toUpperCase()">
+                                                        </div>
+                                                        {{-- Indicator that this student has a record saved --}}
+                                                        <template x-if="student.today_record">
+                                                            <div class="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full"></div>
+                                                        </template>
                                                     </div>
                                                     <div>
                                                         <p class="font-black text-slate-800 text-lg leading-tight" x-text="student.name"></p>
@@ -92,22 +115,20 @@
                                                 </div>
                                             </td>
 
-                                            <td class="p-6">
-                                                <div class="flex items-center justify-center">
-                                                    <div class="inline-flex bg-slate-100 p-1.5 rounded-3xl border border-slate-200/50">
-                                                        <button @click="status = 'present'" :class="status === 'present' ? 'bg-white text-emerald-600 shadow-sm ring-1 ring-slate-200' : 'text-slate-400 hover:text-slate-600'" class="px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Present</button>
-                                                        <button @click="status = 'absent'" :class="status === 'absent' ? 'bg-white text-red-600 shadow-sm ring-1 ring-slate-200' : 'text-slate-400 hover:text-slate-600'" class="px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Absent</button>
-                                                        <button @click="status = 'permission'" :class="status === 'permission' ? 'bg-white text-amber-600 shadow-sm ring-1 ring-slate-200' : 'text-slate-400 hover:text-slate-600'" class="px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">Permission</button>
-                                                    </div>
+                                            <td class="p-6 text-center">
+                                                <div class="inline-flex bg-slate-100 p-1.5 rounded-3xl border border-slate-200/50">
+                                                    <button @click="status = 'present'" :class="status === 'present' ? 'bg-white text-emerald-600 shadow-sm ring-1 ring-slate-200' : 'text-slate-400 hover:text-slate-600'" class="px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer">Present</button>
+                                                    <button @click="status = 'absent'" :class="status === 'absent' ? 'bg-white text-red-600 shadow-sm ring-1 ring-slate-200' : 'text-slate-400 hover:text-slate-600'" class="px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer">Absent</button>
+                                                    <button @click="status = 'permission'" :class="status === 'permission' ? 'bg-white text-amber-600 shadow-sm ring-1 ring-slate-200' : 'text-slate-400 hover:text-slate-600'" class="px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer">Permit</button>
                                                 </div>
                                             </td>
 
                                             <td class="p-6">
                                                 <input type="text"
                                                     x-model="note"
-                                                    placeholder="Reason for absence..."
-                                                    :disabled="status !== 'permission'"
-                                                    :class="status === 'permission' ? 'bg-amber-50/50 border-amber-200 text-amber-900 focus:ring-4 focus:ring-amber-50' : 'bg-slate-50 border-slate-100 text-slate-300 cursor-not-allowed'"
+                                                    placeholder="Add a remark..."
+                                                    :disabled="status === 'present'"
+                                                    :class="status !== 'present' ? 'bg-white border-slate-200 text-slate-700 focus:ring-4 focus:ring-blue-50' : 'bg-slate-50 border-slate-100 text-slate-300 cursor-not-allowed'"
                                                     class="w-full px-5 py-3 border-2 rounded-2xl text-xs font-bold transition-all outline-none">
                                             </td>
                                         </tr>

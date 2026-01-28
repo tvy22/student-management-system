@@ -77,7 +77,11 @@
                 this.classInfo = result.class_info;
 
                 // Initialize students with null stats so the UI has a loading state
-                this.students = result.data.map(s => ({ ...s, stats: null }));
+                this.students = result.data.map(s => ({
+                    ...s,
+                    stats: null,
+                    today_record: s.today_attendance || null
+                }));
 
                 // Fetch stats for each student individually
                 this.students.forEach(async (student, index) => {
@@ -115,28 +119,23 @@
 
     async submitAttendance() {
         this.loading = true;
+            const rows = document.querySelectorAll('.attendance-row');
+            const attendanceData = [];
 
-        const rows = document.querySelectorAll('.attendance-row');
-        const attendanceData = [];
+            rows.forEach(row => {
+                const studentId = row.getAttribute('data-student-id');
+                const rowData = Alpine.$data(row);
 
-        rows.forEach(row => {
-            const studentId = row.getAttribute('data-student-id');
-
-            // Use the official Alpine utility to get data from the row
-            const rowData = Alpine.$data(row);
-
-            const formattedDate = this.attendanceDate;
-
-            if (rowData) {
-                attendanceData.push({
-                    student_id: studentId,
-                    class_id: this.classId,
-                    date: formattedDate,
-                    status: rowData.status,
-                    remark: rowData.note
-                });
-            }
-        });
+                if (studentId && rowData) {
+                    attendanceData.push({
+                        student_id: parseInt(studentId), // Ensure it's an integer
+                        class_id: parseInt(this.classId),
+                        date: this.attendanceDate,
+                        status: rowData.status,
+                        remark: rowData.note || '' // Ensure it's at least an empty string
+                    });
+                }
+            });
 
         if (attendanceData.length === 0) {
             this.loading = false;
@@ -161,14 +160,25 @@
             const failedResponse = responses.find(r => !r.ok);
 
             if (!failedResponse) {
+                // Get the actual data from the responses
+                const results = await Promise.all(responses.map(r => r.json()));
+
+                // Update local student data so the modal remembers without a full refresh
+                results.forEach(res => {
+                    const studentIndex = this.students.findIndex(s => s.id == res.data.student_id);
+                    if (studentIndex !== -1) {
+                        this.students[studentIndex].today_record = res.data;
+                    }
+                });
                 this.$dispatch('notify', { message: 'Attendance Saved!', type: 'success' });
                 this.showTakeAttendanceModal = false;
                 window.dispatchEvent(new CustomEvent('refresh-student-list'));
             } else {
-                
+
                 const errorData = await failedResponse.json();
 
                 // This tries to find 'message' or 'error' keys commonly sent by Laravel
+                console.log('Validation Details:', errorData.errors);
                 const errorMessage = errorData.message || errorData.error || 'Failed to save attendance';
 
                 this.$dispatch('notify', {
