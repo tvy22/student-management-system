@@ -75,12 +75,17 @@
             this.isLoading = true; // Use global loading or a local one
 
             try {
+            await fetch('http://127.0.0.1:8000/sanctum/csrf-cookie', { credentials: 'include' });
+                const xsrfToken = window.getCookie('XSRF-TOKEN');
                 const response = await fetch(`http://127.0.0.1:8000/api/attendence/${this.editAttendanceData.id}`, {
                     method: 'PATCH',
+                    credentials: 'include',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('school_token')}`,
                         'Accept': 'application/json',
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-XSRF-TOKEN': xsrfToken,
                     },
                     body: JSON.stringify({
                         status: this.editAttendanceData.status.toLowerCase(), // API expects lowercase

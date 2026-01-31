@@ -1,5 +1,12 @@
 {{-- dashboard home page --}}
 
+<script>
+    // If there is no token in localStorage, they aren't logged in
+    if (!localStorage.getItem('school_token')) {
+        window.location.href = '/';
+    }
+</script>
+
 @extends('layouts.app')
 
 @section('content')
@@ -69,14 +76,20 @@
     },
 
     async deleteClass() {
+        this.loading = true;
         if (!this.selectedClassId) return;
 
         try {
+            await fetch('http://127.0.0.1:8000/sanctum/csrf-cookie', { credentials: 'include' });
+            const xsrfToken = window.getCookie('XSRF-TOKEN');
             const response = await fetch(`http://127.0.0.1:8000/api/class/${this.selectedClassId}`, {
                 method: 'DELETE',
+                credentials: 'include',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('school_token')}`,
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-XSRF-TOKEN': xsrfToken,
                 }
             });
 
@@ -102,17 +115,25 @@
             }
         } catch (error) {
             console.error('Delete Error:', error);
+        }finally{
+            this.loading = false;
         }
     },
 
     async updateClass() {
+        this.loading = true;
         try {
+        await fetch('http://127.0.0.1:8000/sanctum/csrf-cookie', { credentials: 'include' });
+        const xsrfToken = window.getCookie('XSRF-TOKEN');
             const response = await fetch(`http://127.0.0.1:8000/api/class/${this.selectedClassId}`, {
                 method: 'PATCH',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('school_token')}`,
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                'X-XSRF-TOKEN': xsrfToken,
                 },
                 body: JSON.stringify(this.editFormData)
             });
@@ -139,6 +160,8 @@
             }
         } catch (error) {
             console.error('Update error:', error);
+        }finally{
+            this.loading = false;
         }
     },
 
@@ -202,13 +225,18 @@
         }
 
         try {
+            await fetch('http://127.0.0.1:8000/sanctum/csrf-cookie', { credentials: 'include' });
+        const xsrfToken = window.getCookie('XSRF-TOKEN');
             const requests = attendanceData.map(data =>
                 fetch(`http://127.0.0.1:8000/api/attendence`, {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('school_token')}`,
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                'X-XSRF-TOKEN': xsrfToken,
                     },
                     body: JSON.stringify(data)
                 })

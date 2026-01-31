@@ -30,11 +30,25 @@
 
             {{-- Action Buttons --}}
             <div class="flex flex-col gap-3">
-                <button @click="deleteClass()" type="button" class="w-full py-4 bg-red-500 hover:bg-red-600 text-white font-black rounded-2xl shadow-lg shadow-red-100 transition-all transform active:scale-[0.98] cursor-pointer">
-                    Yes, Delete Class
+                <button
+                    @click="deleteClass()"
+                    type="button"
+                    :disabled="loading"
+                    class="w-full py-4 bg-red-500 hover:bg-red-600 text-white font-black rounded-2xl shadow-lg shadow-red-100 transition-all transform active:scale-[0.98] cursor-pointer"
+                >
+                    <span x-show="!loading">Yes, Delete Class</span>
+                    <span x-show="loading" class="flex items-center justify-center gap-2" x-cloak>
+                        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Deleting...
+                    </span>
+
                 </button>
 
-                <button type="button" @click="showEndClassModal = false" class="w-full py-4 bg-slate-50 text-slate-400 font-bold rounded-2xl hover:bg-slate-100 transition cursor-pointer">
+                <button
+                    type="button" @click="showEndClassModal = false" class="w-full py-4 bg-slate-50 text-slate-400 font-bold rounded-2xl hover:bg-slate-100 transition cursor-pointer">
                     Cancel
                 </button>
             </div>

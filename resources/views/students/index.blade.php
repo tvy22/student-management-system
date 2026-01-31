@@ -145,13 +145,18 @@
         }
 
         try {
+            await fetch('http://127.0.0.1:8000/sanctum/csrf-cookie', { credentials: 'include' });
+        const xsrfToken = window.getCookie('XSRF-TOKEN');
             const requests = attendanceData.map(data =>
                 fetch(`http://127.0.0.1:8000/api/attendence`, {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('school_token')}`,
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                'X-XSRF-TOKEN': xsrfToken,
                     },
                     body: JSON.stringify(data)
                 })

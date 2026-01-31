@@ -16,39 +16,48 @@
         html, body { height: 100%; margin: 0; overflow: hidden; }
         [x-cloak] { display: none !important; }
     </style>
+    <script>
+        if (!localStorage.getItem('school_token')) {
+            window.location.href = '/';
+        }
+    </script>
 </head>
 <body class="antialiased font-sans bg-gray-50 text-gray-900"
       x-data="{
+        loading: false,
         open: false,
         showLogoutModal: false,
         user: (JSON.parse(localStorage.getItem('user_data')) || { user: { name: 'User' } }).user,
 
         async handleLogout() {
-              try {
-                  const token = localStorage.getItem('school_token');
+            this.loading = true;
+            try {
+                const token = localStorage.getItem('school_token');
 
-                  // 1. Tell the backend to kill the token
-                  await fetch('http://localhost:8000/api/logout', {
-                      method: 'POST',
-                      headers: {
-                          'Authorization': `Bearer ${token}`,
-                          'Accept': 'application/json',
-                          'Content-Type': 'application/json'
-                      }
-                  });
+                // 1. Tell the backend to kill the token
+                await fetch('http://localhost:8000/api/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
 
-                  // 2. Clear browser memory
-                  localStorage.removeItem('school_token');
-                  localStorage.removeItem('user_data');
+                // 2. Clear browser memory
+                localStorage.removeItem('school_token');
+                localStorage.removeItem('user_data');
 
-                  // 3. Redirect to login
-                  window.location.href = '/';
-              } catch (error) {
-                  console.error('Logout error:', error);
-                  // Force clear and redirect even if server is down
-                  localStorage.clear();
-                  window.location.href = '/';
-              }
+                // 3. Redirect to login
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Logout error:', error);
+                // Force clear and redirect even if server is down
+                localStorage.clear();
+                window.location.href = '/';
+            }finally{
+                this.loading = false;
+            }
           }
 
         }">

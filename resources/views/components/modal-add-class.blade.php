@@ -1,5 +1,6 @@
 {{-- add class modal --}}
 <div x-data="{
+    isSubmitting: false,
     formData: {
         course: 'React+Laravel',
         room: 'A101',
@@ -7,13 +8,19 @@
         class_time: '9:00-10:30am'
     },
     async submitClass() {
+        this.isSubmitting = true;
         try {
+            await fetch('http://127.0.0.1:8000/sanctum/csrf-cookie', { credentials: 'include' });
+            const xsrfToken = window.getCookie('XSRF-TOKEN');
             const response = await fetch('http://127.0.0.1:8000/api/class', {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('school_token')}`,
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-XSRF-TOKEN': xsrfToken,
                 },
                 body: JSON.stringify(this.formData)
             });
@@ -41,6 +48,8 @@
 
         } catch (error) {
             console.error('Submission failed:', error);
+        }finally{
+            this.isSubmitting = false;
         }
     }
 }" x-show="showAddClassModal" x-cloak class="fixed inset-0 z-100 overflow-y-auto">
@@ -108,8 +117,20 @@
                     </div>
                 </div>
 
-                <button type="submit" class="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-lg shadow-blue-200 transition-all transform active:scale-[0.98] cursor-pointer">
-                    Add New Class
+                <button
+                    type="submit"
+                    :disabled="isSubmitting"
+                    class="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-lg shadow-blue-200 transition-all transform flex justify-center items-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+                >
+                    <span x-show="!isSubmitting">Add New Class</span>
+
+                    <div x-show="isSubmitting" class="flex items-center gap-2" x-cloak>
+                        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Processing...</span>
+                    </div>
                 </button>
             </form>
         </div>

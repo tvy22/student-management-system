@@ -6,11 +6,16 @@ x-data="{
     async deleteStudent() {
         this.isDeleting = true;
         try {
+            await fetch('http://127.0.0.1:8000/sanctum/csrf-cookie', { credentials: 'include' });
+            const xsrfToken = window.getCookie('XSRF-TOKEN');
             const response = await fetch(`http://127.0.0.1:8000/api/student/${selectedStudentToDelete.id}`, {
                 method: 'DELETE',
+                credentials: 'include',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('school_token')}`,
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-XSRF-TOKEN': xsrfToken,
                 }
             });
 

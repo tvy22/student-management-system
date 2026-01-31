@@ -22,11 +22,26 @@
             this.loading = true;
             this.errorMessage = '';
             try {
-                const response = await fetch('http://localhost:8000/api/register', {
+                await fetch('http://127.0.0.1:8000/sanctum/csrf-cookie', {
+                    credentials: 'include'
+                });
+
+                const getCookie = (name) => {
+                    let value = ';' + document.cookie;
+                    let parts = value.split(';' + name + '=');
+                    if (parts.length === 2) return decodeURIComponent(parts.pop().split(';').shift());
+                };
+
+                const xsrfToken = getCookie('XSRF-TOKEN');
+
+                const response = await fetch('http://127.0.0.1:8000/api/register', {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-XSRF-TOKEN': xsrfToken
                     },
                     body: JSON.stringify({
                         name: this.name,
